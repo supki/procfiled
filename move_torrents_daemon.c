@@ -18,31 +18,11 @@
 #define EVENT_BUF_LEN ( 1024 * ( EVENT_SIZE + 16 ) )
 #define SRC_PATH      "/home/maksenov/Downloads/"
 #define DEST_PATH     "/home/maksenov/Downloads/.torrent/"
+#define TORRENT_EXT   "torrent"
 
 void signal_handler( int signal )
 {
-	switch ( signal )
-	{
-	case SIGHUP:
-		syslog( LOG_WARNING, "Received SIGHUP signal." );
-		break;
-
-	case SIGTERM:
-		syslog( LOG_WARNING, "Received SIGTERM signal." );
-		break;
-
-	case SIGINT:
-		syslog( LOG_WARNING, "Received SIGINT signal." );
-		break;
-
-	case SIGQUIT:
-		syslog( LOG_WARNING, "Received SIGQUIT signal." );
-		break;
-
-	default:
-		syslog( LOG_WARNING, "Unhandled signal (%d) %s", strsignal( signal ) );
-		break;
-	}
+	syslog( LOG_WARNING, "Unhandled signal (%d) %s", strsignal( signal ) );
 }
 
 int main( )
@@ -109,7 +89,7 @@ int main( )
 			if ( ( event->len ) && ( event->mask & IN_CREATE ) && !( event->mask & IN_ISDIR ) )
 			{
 				/* Check if created file is .torrent file */
-				if ( !strcmp( event->name + strlen( event->name ) - strlen( "torrent" ), "torrent" ) )
+				if ( !strcmp( event->name + strlen( event->name ) - strlen( TORRENT_EXT ), TORRENT_EXT ) )
 				{
 					char old_path[256], new_path[256];
 					strcpy( old_path, SRC_PATH );
