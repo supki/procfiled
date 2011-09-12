@@ -5,17 +5,87 @@
  * Based on Inotify
  *
  */
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <sys/inotify.h>
+#include <sys/types.h>
+#include <unistd.h>
 
+#define DAEMON_NAME   "mtd"
 #define EVENT_SIZE    ( sizeof (struct inotify_event) )
 #define EVENT_BUF_LEN ( 1024 * ( EVENT_SIZE + 16 ) )
 #define SRC_PATH      "/home/maksenov/Downloads/"
 #define DEST_PATH     "/home/maksenov/Downloads/.torrent/"
 
+void signal_handler( int signal )
+{
+	switch ( signal )
+	{
+	case SIGHUP:
+		syslog( LOG_WARNING, "Received SIGHUP signal." );
+		break;
+
+	case SIGTERM:
+		syslog( LOG_WARNING, "Received SIGTERM signal." );
+		break;
+
+	case SIGINT:
+		syslog( LOG_WARNING, "Received SIGINT signal." );
+		break;
+
+	case SIGQUIT:
+		syslog( LOG_WARNING, "Received SIGQUIT signal." );
+		break;
+
+	default:
+		syslog( LOG_WARNING, "Unhandled signal (%d) %s", strsignal( signal ) );
+		break;
+	}
+}
+
 int main( )
 {
+	signal(SIGHUP, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+
+	syslog( LOG_INFO, "%s daemon starting up", DAEMON_NAME );
+
+	setlogmask( LOG_UPTO( LOG_INFO ) );
+	openlog( DAEMON_NAME, LOG_CONS, LOG_USER );
+
+	syslog(LOG_INFO, "starting the daemonizing process");
+
+	pid_t pid = fork( );
+	if ( pid < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+	if ( pid > 0 )
+	{
+		exit( EXIT_SUCCESS );
+	}
+
+	umask(0);
+
+	pid_t sid = setsid( );
+	if ( sid < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+
+	if ( ( chdir( "/" ) ) < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+
+	close( STDIN_FILENO );
+	close( STDOUT_FILENO );
+	close( STDERR_FILENO );
+
 	int inotify_instance = inotify_init( );
 	int watch_instance = inotify_add_watch( inotify_instance, SRC_PATH, IN_CREATE );
 
@@ -60,6 +130,8 @@ int main( )
 
 	inotify_rm_watch( inotify_instance, watch_instance );
 	close( inotify_instance );
+
+	syslog( LOG_INFO, "%s daemon exiting", DAEMON_NAME );
 
 	return EXIT_SUCCESS;
 }
