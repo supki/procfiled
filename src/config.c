@@ -1,11 +1,27 @@
+#include <pwd.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "config.h"
 
-char * read_config_line( FILE * fstream )
+FILE * open_config( void )
+{
+	struct passwd * pw = getpwuid( getuid( ) );
+	char * config_file_name = (char *) malloc( strlen( pw->pw_dir ) + strlen( "/.mtdconf" ) + 1 );
+	strcpy( config_file_name, pw->pw_dir );
+	strcat( config_file_name, "/.mtdconf" );
+
+	FILE * fstream = fopen( config_file_name, "r" );
+
+	free( config_file_name );
+
+	return fstream;
+}
+
+static char * read_config_line( FILE * fstream )
 {
 	char line[ LINE_MAX ];
 	char * response = fgets( line, LINE_MAX, fstream );
@@ -21,7 +37,7 @@ char * read_config_line( FILE * fstream )
 	return attribute;
 }
 
-config_record_t * read_config_record( FILE * fstream )
+static config_record_t * read_config_record( FILE * fstream )
 {
 	const char * command = read_config_line( fstream );
 	const char * file_mask = read_config_line( fstream );
@@ -44,6 +60,11 @@ config_record_t * read_config_record( FILE * fstream )
 
 config_record_t * read_config( FILE * fstream )
 {
+	if ( !fstream )
+	{
+		return NULL;
+	}
+
 	config_record_t * head, * prev, * next;
 	head = read_config_record( fstream );
 	if ( head )
@@ -61,7 +82,7 @@ config_record_t * read_config( FILE * fstream )
 	return head;
 }
 
-void print_config_record( config_record_t * record )
+static void print_config_record( config_record_t * record )
 {
 	if ( record )
 	{
@@ -74,6 +95,11 @@ void print_config_record( config_record_t * record )
 
 void print_config( config_record_t * record )
 {
+	if ( !record )
+	{
+		return;
+	}
+
 	print_config_record( record );
 
 	do

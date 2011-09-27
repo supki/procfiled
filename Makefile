@@ -9,10 +9,11 @@ INCDIR = include
 OBJFILES = \
 $(OBJDIR)/daemonize.o \
 $(OBJDIR)/config.o \
+$(OBJDIR)/watch.o \
 $(OBJDIR)/main.o \
 
 all: $(OBJFILES)
-	gcc $(CCFLAGS) -o $(SOFTWARE) $(OBJFILES) -I$(INCDIR)
+	gcc $(CCFLAGS) -o $(SOFTWARE) $(OBJFILES) -I$(INCDIR) # -lefence
 	strip --strip-all $(SOFTWARE)
 	echo Done.
 
