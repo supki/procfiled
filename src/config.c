@@ -81,5 +81,5 @@ void print_config( config_record_t * record )
 		record = record->next;
 		print_config_record( record );
 	}
-	while( record->next != NULL );
+	while ( record->next != NULL );
 }
