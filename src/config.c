@@ -32,7 +32,7 @@ static char * read_config_line( config_t * fstream )
 		return NULL;
 	}
 
-	char * attribute = (char *) malloc( strlen( line ) );
+	char * attribute = (char *) malloc( strlen( line ) + 1 );
 	strcpy( attribute, line );
 	attribute[ strlen( line ) - 1 ] = '\0';
 

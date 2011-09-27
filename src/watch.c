@@ -12,7 +12,7 @@ watch_record_t * init_watches( int inotify_instance, config_record_t * config_he
 	for_each( config_record_t, config_head, config_record )
 	{
 		watch_record = ( watch_record_t * ) malloc( sizeof( watch_record_t ) );
-		watch_record->wd = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE );
+		watch_record->wd = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_ACCESS | IN_ATTRIB | IN_OPEN );
 		watch_record->info = config_record;
 		if ( prev_watch_record )
 		{

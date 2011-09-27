@@ -38,7 +38,6 @@ int main( )
 	char buffer[ EVENT_BUF_LEN ];
 	while ( 1 )
 	{
-
 		int length = read( inotify_instance, (void *)buffer, EVENT_BUF_LEN );
 		if ( length < 0 )
 		{
@@ -82,6 +81,7 @@ int main( )
 				}
 
 				globfree( &glob_record );
+				free( pattern );
 			}
 
 			i += EVENT_SIZE + event->len;
