@@ -5,6 +5,7 @@
  * Based on Inotify
  *
  */
+#include <glob.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
@@ -51,27 +52,36 @@ int main( )
 
 			for_each( watch_record_t, watch_head, watch_record )
 			{
-				if ( ( watch_record->wd != event->wd ) ||
-					!( event->mask & IN_CREATE ) ||
-					( event->mask & IN_ISDIR ) ||
-					!( event->len ) )
+				if ( ( watch_record->wd != event->wd ) || !( event->len ) )
 				{
 					continue;
 				}
 
-				if ( !strcmp( event->name + strlen( event->name ) - strlen( watch_record->info->file_mask ), watch_record->info->file_mask ) )
+				glob_t glob_record;
+				char * pattern = (char *) malloc( strlen( watch_record->info->source_path ) + strlen( "/" ) + strlen( watch_record->info->pattern ) + 1 );
+				strcpy( pattern, watch_record->info->source_path );
+				strcat( pattern, "/" );
+				strcat( pattern, watch_record->info->pattern );
+				if ( glob( pattern, GLOB_MARK | GLOB_NOSORT, NULL, &glob_record ) < 0 )
 				{
-					char old_path[256], new_path[256];
-					strcpy( old_path, watch_record->info->source_path );
-					strcat( old_path, event->name );
-					strcpy( new_path, watch_record->info->destination_path );
-					strcat( new_path, event->name );
+					return EXIT_FAILURE;
+				}
 
-					if ( rename( old_path, new_path ) == -1 )
+				for ( unsigned int j = 0; j < glob_record.gl_pathc; j++ )
+				{
+					char new_path[256];
+					strcpy( new_path, watch_record->info->destination_path );
+					strcat( new_path, "/" );
+					strcat( new_path, event->name );
+					printf( "%s %s\n", glob_record.gl_pathv[j], new_path );
+
+					if ( rename( glob_record.gl_pathv[j], new_path ) == -1 )
 					{
 						return EXIT_FAILURE;
 					}
 				}
+
+				globfree( &glob_record );
 			}
 
 			i += EVENT_SIZE + event->len;

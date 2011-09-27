@@ -42,18 +42,18 @@ static char * read_config_line( config_t * fstream )
 static config_record_t * read_config_record( config_t * fstream )
 {
 	const char * command = read_config_line( fstream );
-	const char * file_mask = read_config_line( fstream );
+	const char * pattern = read_config_line( fstream );
 	const char * source_path = read_config_line( fstream );
 	const char * destination_path = read_config_line( fstream );
 
-	if ( !command || !file_mask || !source_path || !destination_path )
+	if ( !command || !pattern || !source_path || !destination_path )
 	{
 		return NULL;
 	}
 
 	config_record_t * record = (config_record_t *) malloc( sizeof( config_record_t ) );
 	record->command = command;
-	record->file_mask = file_mask;
+	record->pattern = pattern;
 	record->source_path = source_path;
 	record->destination_path = destination_path;
 
@@ -89,7 +89,7 @@ static void print_config_record( config_record_t * record )
 	if ( record )
 	{
 		printf( "Do: %s\n", record->command );
-		printf( "What: %s\n", record->file_mask );
+		printf( "What: %s\n", record->pattern );
 		printf( "From: %s\n", record->source_path );
 		printf( "To: %s\n", record->destination_path );
 	}

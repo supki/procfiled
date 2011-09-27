@@ -6,7 +6,7 @@
 typedef struct config_record_s
 {
 	const char * command;
-	const char * file_mask;
+	const char * pattern;
 	const char * source_path;
 	const char * destination_path;
 	struct config_record_s * next;
