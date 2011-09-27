@@ -8,25 +8,18 @@
 
 watch_record_t * init_watches( int inotify_instance, config_record_t * config_head )
 {
-	watch_record_t * watch_head = NULL, * prev_watch_record = NULL, * watch_record;
+	watch_record_t * prev_watch_record = NULL, * watch_record = NULL;
 	for_each( config_record_t, config_head, config_record )
 	{
 		watch_record = ( watch_record_t * ) malloc( sizeof( watch_record_t ) );
 		watch_record->wd = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_ACCESS | IN_ATTRIB | IN_OPEN );
 		watch_record->info = config_record;
-		if ( prev_watch_record )
-		{
-			prev_watch_record->next = watch_record;
-		}
-		if ( !watch_head )
-		{
-			watch_head = watch_record;
-		}
-		watch_record->next = NULL;
+		watch_record->next = prev_watch_record;
+
 		prev_watch_record = watch_record;
 	}
 
-	return watch_head;
+	return watch_record;
 }
 
 void print_watches( watch_record_t * watch_head )
