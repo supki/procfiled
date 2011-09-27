@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <wordexp.h>
 
 #include "config.h"
 
@@ -23,28 +24,37 @@ config_t * open_config( void )
 	return fstream;
 }
 
-static char * read_config_line( config_t * fstream )
+static char * read_config_line( config_t * fstream, int is_path )
 {
-	char line[ BUFSIZ ];
+	char * line = (char *) malloc ( BUFSIZ );
 	char * response = fgets( line, BUFSIZ, fstream );
 	if ( response != line )
 	{
 		return NULL;
 	}
+	line[ strlen( line ) - 1 ] = '\0';
+
+	if ( is_path )
+	{
+		wordexp_t wordexp_buffer;
+		wordexp( line, &wordexp_buffer, 0 );
+		strcpy( line, wordexp_buffer.we_wordv[0] );
+		wordfree( &wordexp_buffer );
+	}
 
 	char * attribute = (char *) malloc( strlen( line ) + 1 );
 	strcpy( attribute, line );
-	attribute[ strlen( line ) - 1 ] = '\0';
+	free( line );
 
 	return attribute;
 }
 
 static config_record_t * read_config_record( config_t * fstream )
 {
-	const char * command = read_config_line( fstream );
-	const char * pattern = read_config_line( fstream );
-	const char * source_path = read_config_line( fstream );
-	const char * destination_path = read_config_line( fstream );
+	const char * command = read_config_line( fstream, 0 );
+	const char * pattern = read_config_line( fstream, 0 );
+	const char * source_path = read_config_line( fstream, 1 );
+	const char * destination_path = read_config_line( fstream, 1 );
 
 	if ( !command || !pattern || !source_path || !destination_path )
 	{

@@ -18,14 +18,12 @@ watch_record_t * init_watches( int inotify_instance, config_record_t * config_he
 		{
 			prev_watch_record->next = watch_record;
 		}
-		else
-		{
-			prev_watch_record = watch_record;
-		}
 		if ( !watch_head )
 		{
 			watch_head = watch_record;
 		}
+		watch_record->next = NULL;
+		prev_watch_record = watch_record;
 	}
 
 	return watch_head;

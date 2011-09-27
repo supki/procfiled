@@ -24,16 +24,14 @@
 
 int main( )
 {
-	/* daemonize( ); */
+	daemonize( );
 
 	config_t * config = open_config( );
 	config_record_t * config_head = read_config( config );
-	print_config( config_head );
 
 	int inotify_instance = inotify_init( );
 
 	watch_record_t * watch_head = init_watches( inotify_instance, config_head );
-	print_watches( watch_head );
 
 	char buffer[ EVENT_BUF_LEN ];
 	while ( 1 )
@@ -68,16 +66,14 @@ int main( )
 
 				for ( unsigned int j = 0; j < glob_record.gl_pathc; j++ )
 				{
-					char new_path[256];
+					char * new_path = (char *) malloc( strlen( watch_record->info->destination_path ) + strlen( "/" ) + strlen( event->name ) + 1 );
 					strcpy( new_path, watch_record->info->destination_path );
 					strcat( new_path, "/" );
 					strcat( new_path, event->name );
-					printf( "%s %s\n", glob_record.gl_pathv[j], new_path );
 
-					if ( rename( glob_record.gl_pathv[j], new_path ) == -1 )
-					{
-						return EXIT_FAILURE;
-					}
+					rename( glob_record.gl_pathv[j], new_path );
+
+					free( new_path );
 				}
 
 				globfree( &glob_record );
