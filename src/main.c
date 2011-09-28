@@ -22,9 +22,23 @@
 #define for_each(type, head, item) \
     for(type * item = head; item != NULL; item = item->next)
 
-int main( )
+static int daemon_mode = 1;
+
+void get_options( int argc, char * argv[] )
 {
-	daemonize( );
+	for( int i = 1; i < argc; i++ )
+	{
+		if ( !strcmp( argv[i], "--no-daemon" ) )
+		{
+			daemon_mode = 0;
+		}
+	}
+}
+
+int main( int argc, char * argv[] )
+{
+	get_options( argc, argv );
+	if ( daemon_mode ) daemonize( );
 
 	config_t * config = open_config( );
 	config_record_t * config_head = read_config( config );
