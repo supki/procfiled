@@ -35,7 +35,7 @@ void get_options( int argc, char * argv[] )
 		}
 		if ( !strcmp( argv[i], "--conf" ) )
 		{
-			config_file = shell_expand_path( argv[ ++i ] );
+			config_file = expand_path( argv[ ++i ] );
 			default_config_mode = 0;
 		}
 	}
@@ -51,27 +51,14 @@ void print_version( void )
 void daemonize( void )
 {
 	pid_t pid = fork( );
-	if ( pid < 0 )
-	{
-		exit( EXIT_FAILURE );
-	}
-	if ( pid > 0 )
-	{
-		exit( EXIT_SUCCESS );
-	}
+	if ( pid < 0 ) exit( EXIT_FAILURE );
+	if ( pid > 0 ) exit( EXIT_SUCCESS );
 
 	umask( 0 );
 
-	pid_t sid = setsid( );
-	if ( sid < 0 )
-	{
-		exit( EXIT_FAILURE );
-	}
+	if ( setsid( ) < 0 ) exit( EXIT_FAILURE );
 
-	if ( ( chdir( "/" ) ) < 0 )
-	{
-		exit( EXIT_FAILURE );
-	}
+	if ( ( chdir( "/" ) ) < 0 ) exit( EXIT_FAILURE );
 
 	close( STDIN_FILENO );
 	close( STDOUT_FILENO );
@@ -80,7 +67,7 @@ void daemonize( void )
 
 void set_default_config_name( void )
 {
-	config_file = construct_path( shell_expand_path( "~" ), ".mtdconf" );
+	config_file = construct_path( expand_path( "~" ), ".mtdconf" );
 }
 
 int main( int argc, char * argv[] )

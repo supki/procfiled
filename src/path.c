@@ -20,7 +20,7 @@ void destroy_path( char * path )
 	free( path );
 }
 
-char * shell_expand_path( char * path )
+char * expand_path( char * path )
 {
 	char * expanded = (char *) malloc ( BUFSIZ );
 
@@ -30,4 +30,13 @@ char * shell_expand_path( char * path )
 	wordfree( &wordexp_buffer );
 
 	return expanded;
+}
+
+char * expand_path_length( char * line, unsigned int length )
+{
+	char piece[ length + 1 ];
+	strncpy( piece, line, length );
+	piece[ length ] = '\0';
+
+	return expand_path( piece );
 }
