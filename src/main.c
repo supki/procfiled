@@ -35,6 +35,21 @@ void get_options( int argc, char * argv[] )
 	}
 }
 
+char * construct_path( const char * dir_name, const char * file_name )
+{
+	char * path = (char *) malloc( strlen( dir_name ) + strlen( file_name ) + 2 );
+	strcpy( path, dir_name);
+	strcat( path, "/" );
+	strcat( path, file_name );
+
+	return path;
+}
+
+void destroy_path( char * path )
+{
+	free( path );
+}
+
 int main( int argc, char * argv[] )
 {
 	get_options( argc, argv );
@@ -70,20 +85,13 @@ int main( int argc, char * argv[] )
 
 				if ( !fnmatch( watch_record->info->pattern, event->name, 0 ) )
 				{
-					char * old_path = (char *) malloc( strlen( watch_record->info->source_path ) + strlen( "/" ) + strlen( event->name ) + 1 );
-					strcpy( old_path, watch_record->info->source_path );
-					strcat( old_path, "/" );
-					strcat( old_path, event->name );
-
-					char * new_path = (char *) malloc( strlen( watch_record->info->destination_path ) + strlen( "/" ) + strlen( event->name ) + 1 );
-					strcpy( new_path, watch_record->info->destination_path );
-					strcat( new_path, "/" );
-					strcat( new_path, event->name );
+					char * old_path = construct_path( watch_record->info->source_path, event->name );
+					char * new_path = construct_path( watch_record->info->destination_path, event->name );
 
 					rename( old_path, new_path );
 
-					free( old_path );
-					free( new_path );
+					destroy_path( old_path );
+					destroy_path( new_path );
 				}
 			}
 
