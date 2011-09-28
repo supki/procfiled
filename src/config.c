@@ -16,9 +16,7 @@ static unsigned int current_position = 0;
 
 config_t * open_config( const char * path )
 {
-	config_t * config = fopen( path, "r" );
-
-	return config;
+	return fopen( path, "r" );
 }
 
 int eat_whitespaces( char * line, unsigned int position )

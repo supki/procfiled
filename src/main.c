@@ -1,4 +1,6 @@
+#include <fcntl.h>
 #include <fnmatch.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
@@ -17,6 +19,7 @@
     for(type * item = head; item != NULL; item = item->next)
 
 static int print_version_mode = 0;
+static int kill_daemon_mode = 0;
 static int daemon_mode = 1;
 static int default_config_mode = 1;
 static char * config_file = NULL;
@@ -28,6 +31,10 @@ void get_options( int argc, char * argv[] )
 		if ( !strcmp( argv[i], "--version" ) )
 		{
 			print_version_mode = 1;
+		}
+		if ( !strcmp( argv[i], "--kill" ) )
+		{
+			kill_daemon_mode = 1;
 		}
 		if ( !strcmp( argv[i], "--no-daemon" ) )
 		{
@@ -46,6 +53,15 @@ void print_version( void )
 	printf( "mtd (MTD: Move Torrents Daemon) 0.1.0\n\nCopyright (C) 2011 Matvey Aksenov <matvey.aksenov@gmail.com>\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 
 	exit( EXIT_SUCCESS );
+}
+
+void kill_daemon( void )
+{
+	int fd = open( construct_path( expand_path( "~" ), ".mtdpid" ), O_RDONLY );
+	int pid;
+	read( fd, &pid, sizeof( pid ) );
+	close( fd );
+	kill( pid, 9 );
 }
 
 void daemonize( void )
@@ -70,12 +86,22 @@ void set_default_config_name( void )
 	config_file = construct_path( expand_path( "~" ), ".mtdconf" );
 }
 
+void save_pid( void )
+{
+	int fd = open( construct_path( expand_path( "~" ), ".mtdpid" ), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
+	int pid = getpid( );
+	write( fd, &pid, sizeof( pid ) );
+	close( fd );
+}
+
 int main( int argc, char * argv[] )
 {
 	get_options( argc, argv );
 	if ( print_version_mode ) print_version( );
+	if ( kill_daemon_mode ) kill_daemon( );
 	if ( daemon_mode ) daemonize( );
 	if ( default_config_mode ) set_default_config_name( );
+	save_pid( );
 
 	int inotify_instance = inotify_init( );
 
