@@ -1,10 +1,3 @@
-/*
- * Move Torrent Daemon
- *
- * Automatically moves files
- * Based on Inotify
- *
- */
 #include <fnmatch.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +16,7 @@
 #define for_each(type, head, item) \
     for(type * item = head; item != NULL; item = item->next)
 
+static int print_version_mode = 0;
 static int daemon_mode = 1;
 static int default_config_mode = 1;
 static char * config_file = NULL;
@@ -31,6 +25,10 @@ void get_options( int argc, char * argv[] )
 {
 	for( int i = 1; i < argc; i++ )
 	{
+		if ( !strcmp( argv[i], "--version" ) )
+		{
+			print_version_mode = 1;
+		}
 		if ( !strcmp( argv[i], "--no-daemon" ) )
 		{
 			daemon_mode = 0;
@@ -41,6 +39,13 @@ void get_options( int argc, char * argv[] )
 			default_config_mode = 0;
 		}
 	}
+}
+
+void print_version( void )
+{
+	printf( "mtd (MTD: Move Torrents Daemon) 0.1.0\n\nCopyright (C) 2011 Matvey Aksenov <matvey.aksenov@gmail.com>\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
+
+	exit( EXIT_SUCCESS );
 }
 
 void daemonize( void )
@@ -81,6 +86,7 @@ void set_default_config_name( void )
 int main( int argc, char * argv[] )
 {
 	get_options( argc, argv );
+	if ( print_version_mode ) print_version( );
 	if ( daemon_mode ) daemonize( );
 	if ( default_config_mode ) set_default_config_name( );
 
@@ -98,8 +104,7 @@ int main( int argc, char * argv[] )
 			return EXIT_FAILURE;
 		}
 
-		int i = 0;
-		while ( i < length )
+		for ( int i = 0; i < length; i += EVENT_SIZE + ( (struct inotify_event *) &buffer[ i ] )->len )
 		{
 			struct inotify_event * event = (struct inotify_event *) &buffer[ i ];
 
@@ -122,8 +127,6 @@ int main( int argc, char * argv[] )
 					destroy_path( new_path );
 				}
 			}
-
-			i += EVENT_SIZE + event->len;
 		}
 	}
 
