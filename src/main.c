@@ -5,7 +5,7 @@
  * Based on Inotify
  *
  */
-#include <glob.h>
+#include <fnmatch.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
@@ -54,30 +54,23 @@ int main( )
 					continue;
 				}
 
-				glob_t glob_record;
-				char * pattern = (char *) malloc( strlen( watch_record->info->source_path ) + strlen( "/" ) + strlen( watch_record->info->pattern ) + 1 );
-				strcpy( pattern, watch_record->info->source_path );
-				strcat( pattern, "/" );
-				strcat( pattern, watch_record->info->pattern );
-				if ( glob( pattern, GLOB_MARK | GLOB_NOSORT, NULL, &glob_record ) < 0 )
+				if ( !fnmatch( watch_record->info->pattern, event->name, 0 ) )
 				{
-					return EXIT_FAILURE;
-				}
+					char * old_path = (char *) malloc( strlen( watch_record->info->source_path ) + strlen( "/" ) + strlen( event->name ) + 1 );
+					strcpy( old_path, watch_record->info->source_path );
+					strcat( old_path, "/" );
+					strcat( old_path, event->name );
 
-				for ( unsigned int j = 0; j < glob_record.gl_pathc; j++ )
-				{
 					char * new_path = (char *) malloc( strlen( watch_record->info->destination_path ) + strlen( "/" ) + strlen( event->name ) + 1 );
 					strcpy( new_path, watch_record->info->destination_path );
 					strcat( new_path, "/" );
 					strcat( new_path, event->name );
 
-					rename( glob_record.gl_pathv[j], new_path );
+					rename( old_path, new_path );
 
+					free( old_path );
 					free( new_path );
 				}
-
-				globfree( &glob_record );
-				free( pattern );
 			}
 
 			i += EVENT_SIZE + event->len;
