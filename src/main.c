@@ -9,13 +9,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "daemonize.h"
-#include "path.h"
+#include "path.h" 
 #include "watch.h"
 
+#define DAEMON_NAME   "mtd"
 #define EVENT_SIZE    ( sizeof (struct inotify_event) )
 #define EVENT_BUF_LEN ( 1024 * ( EVENT_SIZE + 16 ) )
 
@@ -42,6 +43,36 @@ void get_options( int argc, char * argv[] )
 	}
 }
 
+void daemonize( void )
+{
+	pid_t pid = fork( );
+	if ( pid < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+	if ( pid > 0 )
+	{
+		exit( EXIT_SUCCESS );
+	}
+
+	umask( 0 );
+
+	pid_t sid = setsid( );
+	if ( sid < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+
+	if ( ( chdir( "/" ) ) < 0 )
+	{
+		exit( EXIT_FAILURE );
+	}
+
+	close( STDIN_FILENO );
+	close( STDOUT_FILENO );
+	close( STDERR_FILENO );
+}
+
 void set_default_config_name( void )
 {
 	config_file = construct_path( shell_expand_path( "~" ), ".mtdconf" );
@@ -56,6 +87,7 @@ int main( int argc, char * argv[] )
 	int inotify_instance = inotify_init( );
 
 	watch_record_t * watch_head = init_watches( config_file, inotify_instance );
+	print_watches( watch_head );
 
 	char buffer[ EVENT_BUF_LEN ];
 	while ( 1 )
@@ -83,6 +115,7 @@ int main( int argc, char * argv[] )
 					char * old_path = construct_path( watch_record->info->source_path, event->name );
 					char * new_path = construct_path( watch_record->info->destination_path, event->name );
 
+					printf( "%s -> %s\n", old_path, new_path );
 					rename( old_path, new_path );
 
 					destroy_path( old_path );
