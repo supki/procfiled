@@ -10,7 +10,7 @@ typedef struct watch_record_s
 	struct watch_record_s * next;
 } watch_record_t;
 
-watch_record_t * init_watches( int inotify_instance, config_record_t * config_head );
+watch_record_t * init_watches( char * config_file, int inotify_instance );
 void print_watches( watch_record_t * watch_head );
 
 #endif /* #define _MTD_WATCH_H_ */

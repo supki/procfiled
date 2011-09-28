@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #include "daemonize.h"
-#include "config.h"
+#include "path.h"
 #include "watch.h"
 
 #define EVENT_SIZE    ( sizeof (struct inotify_event) )
@@ -23,6 +23,8 @@
     for(type * item = head; item != NULL; item = item->next)
 
 static int daemon_mode = 1;
+static int default_config_mode = 1;
+static char * config_file = NULL;
 
 void get_options( int argc, char * argv[] )
 {
@@ -32,35 +34,28 @@ void get_options( int argc, char * argv[] )
 		{
 			daemon_mode = 0;
 		}
+		if ( !strcmp( argv[i], "--conf" ) )
+		{
+			config_file = shell_expand_path( argv[ ++i ] );
+			default_config_mode = 0;
+		}
 	}
 }
 
-char * construct_path( const char * dir_name, const char * file_name )
+void set_default_config_name( void )
 {
-	char * path = (char *) malloc( strlen( dir_name ) + strlen( file_name ) + 2 );
-	strcpy( path, dir_name);
-	strcat( path, "/" );
-	strcat( path, file_name );
-
-	return path;
-}
-
-void destroy_path( char * path )
-{
-	free( path );
+	config_file = construct_path( shell_expand_path( "~" ), ".mtdconf" );
 }
 
 int main( int argc, char * argv[] )
 {
 	get_options( argc, argv );
 	if ( daemon_mode ) daemonize( );
-
-	config_t * config = open_config( );
-	config_record_t * config_head = read_config( config );
+	if ( default_config_mode ) set_default_config_name( );
 
 	int inotify_instance = inotify_init( );
 
-	watch_record_t * watch_head = init_watches( inotify_instance, config_head );
+	watch_record_t * watch_head = init_watches( config_file, inotify_instance );
 
 	char buffer[ EVENT_BUF_LEN ];
 	while ( 1 )

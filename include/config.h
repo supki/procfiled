@@ -14,7 +14,7 @@ typedef struct config_record_s
 
 typedef FILE config_t;
 
-config_t * open_config( void );
+config_t * open_config( const char * path );
 config_record_t * read_config( FILE * fstream );
 void print_config( config_record_t * config_head );
 

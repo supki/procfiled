@@ -1,5 +1,3 @@
-#include <pwd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,18 +8,11 @@
 #define for_each(type, head, item) \
     for(type * item = head; item != NULL; item = item->next)
 
-config_t * open_config( void )
+config_t * open_config( const char * path )
 {
-	struct passwd * pw = getpwuid( getuid( ) );
-	char * config_file_name = (char *) malloc( strlen( pw->pw_dir ) + strlen( "/.mtdconf" ) + 1 );
-	strcpy( config_file_name, pw->pw_dir );
-	strcat( config_file_name, "/.mtdconf" );
+	config_t * config = fopen( path, "r" );
 
-	config_t * fstream = fopen( config_file_name, "r" );
-
-	free( config_file_name );
-
-	return fstream;
+	return config;
 }
 
 static char * read_config_line( config_t * fstream, int is_path )

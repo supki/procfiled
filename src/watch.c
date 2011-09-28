@@ -6,8 +6,11 @@
 #define for_each(type, head, item) \
     for(type * item = head; item != NULL; item = item->next)
 
-watch_record_t * init_watches( int inotify_instance, config_record_t * config_head )
+watch_record_t * init_watches( char * config_file, int inotify_instance )
 {
+	config_t * config = open_config( config_file );
+	config_record_t * config_head = read_config( config );
+
 	watch_record_t * prev_watch_record = NULL, * watch_record = NULL;
 	for_each( config_record_t, config_head, config_record )
 	{
