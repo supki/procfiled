@@ -34,10 +34,10 @@ Second, you need to start daemon:
 That's all!
 
 ###useful options###
-* --kill - Kill the currently running MTD session.
-* --no-daemon -	Don't detach from console.
-* --conf FILE -	Read configuration options from file. ~/.mtdconf is used by default
-* --version - Display version information and exit.
+* `--kill` - Kill the currently running MTD session.
+* `--no-daemon` -	Don't detach from console.
+* `--conf FILE` -	Read configuration options from file. ~/.mtdconf is used by default
+* `--version` - Display version information and exit.
 
 What is implemented?
 --------------------
