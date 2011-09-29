@@ -28,9 +28,13 @@ How to install (or uninstall) MTD?
 How to use it?
 --------------
 First, you need configuration file in next format:
+
 	<command> <pattern> <from> <to>
+
 Second, you need to start daemon:
+
 	$ mtd
+
 That's all!
 
 ###useful options###
