@@ -31,12 +31,3 @@ char * expand_path( char * path )
 
 	return expanded;
 }
-
-char * expand_path_length( char * line, unsigned int length )
-{
-	char piece[ length + 1 ];
-	strncpy( piece, line, length );
-	piece[ length ] = '\0';
-
-	return expand_path( piece );
-}

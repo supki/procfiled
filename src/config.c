@@ -48,12 +48,21 @@ static void read_config_attribute_refresh( void )
 	current_position = 0;
 }
 
-static char * extract_attribute( char * line, unsigned int length )
+static char * construct_mode_config_argument( char * line, unsigned int length )
 {
 	char * attribute = malloc( length + 1 );
 	strncpy( attribute, line, length );
 	attribute[ length ] = '\0';
 	return attribute;
+}
+
+static char * construct_path_config_argument( char * line, unsigned int length )
+{
+	char attribute[ length + 1 ];
+	strncpy( attribute, line, length );
+	attribute[ length ] = '\0';
+
+	return expand_path( attribute );
 }
 
 static char * read_config_attribute( char * line, char * (*get_attribute)(char *, unsigned int ) )
@@ -73,10 +82,10 @@ static config_record_t * read_config_record( config_t * config )
 
 	config_record_t * record = (config_record_t *) malloc( sizeof( config_record_t ) );
 	read_config_attribute_refresh( );
-	record->command = read_config_attribute( line, extract_attribute );
-	record->pattern = read_config_attribute( line, extract_attribute );
-	record->source_path = read_config_attribute( line, expand_path_length );
-	record->destination_path = read_config_attribute( line, expand_path_length );
+	record->command = read_config_attribute( line, construct_mode_config_argument );
+	record->pattern = read_config_attribute( line, construct_mode_config_argument );
+	record->source_path = read_config_attribute( line, construct_path_config_argument );
+	record->destination_path = read_config_attribute( line, construct_path_config_argument );
 
 	return record;
 }
