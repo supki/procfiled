@@ -33,7 +33,7 @@ First, you need configuration file in next format:
 
 Second, you need to start daemon:
 
-	$ mtd
+	$ mtd [options]
 
 That's all!
 
