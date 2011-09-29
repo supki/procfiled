@@ -106,11 +106,8 @@ config_record_t * read_config( config_t * config )
 
 static void print_config_record( config_record_t * record )
 {
-	if ( record )
-	{
-		printf( "%s %s:\n%s -> %s\n",
-			record->command, record->pattern, record->source_path, record->destination_path );
-	}
+	printf( "%s %s:\n%s -> %s\n",
+		record->command, record->pattern, record->source_path, record->destination_path );
 }
 
 void print_config( config_record_t * config_head )
