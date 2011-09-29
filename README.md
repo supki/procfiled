@@ -3,7 +3,8 @@ MTD - Move Torrent Daemon
 
 What is MTD?
 ------------
-Move Torrent Daemon is a daemon, that automatically works with files. It could manage your ~/Downloads directory, for example. Consider next configuration file:
+Move Torrent Daemon is a daemon, that automatically works with files. It could manage your ~/Downloads directory, for example. Consider:
+###config example###
 	$ cat ~/.mtdconf
 	move	*.torrent	~/Downloads	~/Downloads/.torrents
 	move	*.png		~/Downloads	~/Pictures
