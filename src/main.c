@@ -51,7 +51,6 @@ void get_options( int argc, char * argv[] )
 void print_version( void )
 {
 	printf( "mtd (MTD: Move Torrents Daemon) 0.1.0\n\nCopyright (C) 2011 Matvey Aksenov <matvey.aksenov@gmail.com>\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
-
 	exit( EXIT_SUCCESS );
 }
 
@@ -62,6 +61,7 @@ void kill_daemon( void )
 	read( fd, &pid, sizeof( pid ) );
 	close( fd );
 	kill( pid, 9 );
+	exit( EXIT_SUCCESS );
 }
 
 void daemonize( void )
