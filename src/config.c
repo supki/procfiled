@@ -71,10 +71,10 @@ static char * read_config_attribute( char * line, int need_expansion )
 	return extract_attribute( line + start_position, current_position - start_position, need_expansion );
 }
 
-static config_record_t * read_config_record( config_t * fstream )
+static config_record_t * read_config_record( config_t * config )
 {
 	char line[BUFSIZ];
-	if ( line != fgets( line, BUFSIZ, fstream ) ) return NULL;
+	if ( line != fgets( line, BUFSIZ, config ) ) return NULL;
 	line[ strlen( line ) - 1 ] = '\0';
 
 	config_record_t * record = (config_record_t *) malloc( sizeof( config_record_t ) );
@@ -87,21 +87,21 @@ static config_record_t * read_config_record( config_t * fstream )
 	return record;
 }
 
-config_record_t * read_config( config_t * fstream )
+config_record_t * read_config( config_t * config )
 {
-	if ( !fstream )
+	if ( !config )
 	{
 		return NULL;
 	}
 
 	config_record_t * head, * prev, * next;
-	head = read_config_record( fstream );
+	head = read_config_record( config );
 	if ( head )
 	{
 		prev = head;
 		do
 		{
-			next = read_config_record( fstream );
+			next = read_config_record( config );
 			prev->next = next;
 			prev = next;
 		}
