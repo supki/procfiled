@@ -4,13 +4,13 @@ MTD - Move Torrent Daemon
 What is MTD?
 ------------
 Move Torrent Daemon is a daemon, that automatically works with files. It could manage your ~/Downloads directory, for example. Consider next configuration file:
-> $ cat ~/.mtdconf
-> move	*.torrent	~/Downloads	~/Downloads/.torrents
-> move	*.png		~/Downloads	~/Pictures
-> move	*.jpg		~/Downloads	~/Pictures
-> move	*.gif		~/Downloads	~/Pictures
-> move	*.avi		~/Downloads	~/Videos
-> move	*.mp4		~/Downloads	~/Videos
+	$ cat ~/.mtdconf
+	move	*.torrent	~/Downloads	~/Downloads/.torrents
+	move	*.png		~/Downloads	~/Pictures
+	move	*.jpg		~/Downloads	~/Pictures
+	move	*.gif		~/Downloads	~/Pictures
+	move	*.avi		~/Downloads	~/Videos
+	move	*.mp4		~/Downloads	~/Videos
 
 What about licensing?
 ---------------------
@@ -19,17 +19,17 @@ MTD is licensed under GPLv3
 How to install (or uninstall) MTD?
 ----------------------------------
 ###install###
->$ ./install.sh --dir=${DIR}
->$ mtd
+	$ ./install.sh --dir=${DIR}
+	$ mtd
 ###uninstall###
->$ ./install.sh --uninstall --dir=${DIR}
+	$ ./install.sh --uninstall --dir=${DIR}
 
 How to use it?
 --------------
 First, you need configuration file in next format:
-><command> <pattern> <from> <to>
+	<command> <pattern> <from> <to>
 Second, you need to start daemon:
->$ mtd
+	$ mtd
 That's all!
 
 ###useful options###
