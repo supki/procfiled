@@ -48,27 +48,21 @@ static void read_config_attribute_refresh( void )
 	current_position = 0;
 }
 
-static char * extract_attribute( char * line, unsigned int length, int need_expansion )
+static char * extract_attribute( char * line, unsigned int length )
 {
-	if ( need_expansion )
-	{
-		return expand_path_length( line, length );
-	}
-	else
-	{
-		char * attribute = malloc( length + 1 );
-		strncpy( attribute, line, length );
-		attribute[ length ] = '\0';
-		return attribute;
-	}
+	char * attribute = malloc( length + 1 );
+	strncpy( attribute, line, length );
+	attribute[ length ] = '\0';
+	return attribute;
 }
 
-static char * read_config_attribute( char * line, int need_expansion )
+static char * read_config_attribute( char * line, char * (*get_attribute)(char *, unsigned int ) )
 {
 	unsigned int start_position = eat_whitespaces( line, current_position );
+	if ( start_position == strlen( line ) ) return NULL;
 	current_position = eat_not_whitespaces( line, start_position );
 
-	return extract_attribute( line + start_position, current_position - start_position, need_expansion );
+	return get_attribute( line + start_position, current_position - start_position );
 }
 
 static config_record_t * read_config_record( config_t * config )
@@ -79,12 +73,17 @@ static config_record_t * read_config_record( config_t * config )
 
 	config_record_t * record = (config_record_t *) malloc( sizeof( config_record_t ) );
 	read_config_attribute_refresh( );
-	record->command = read_config_attribute( line, 0 );
-	record->pattern = read_config_attribute( line, 0 );
-	record->source_path = read_config_attribute( line, 1 );
-	record->destination_path = read_config_attribute( line, 1 );
+	record->command = read_config_attribute( line, extract_attribute );
+	record->pattern = read_config_attribute( line, extract_attribute );
+	record->source_path = read_config_attribute( line, expand_path_length );
+	record->destination_path = read_config_attribute( line, expand_path_length );
 
 	return record;
+}
+
+static int is_not_valid_config_record( config_record_t * record )
+{
+	return ( !record->command || !record->pattern || !record->source_path || !record->destination_path );
 }
 
 config_record_t * read_config( config_t * config )
@@ -97,8 +96,8 @@ config_record_t * read_config( config_t * config )
 	config_record_t * prev_config_record = NULL, * config_record;
 	while ( ( config_record = read_config_record( config ) ) != NULL )
 	{
+		if ( is_not_valid_config_record( config_record ) ) continue;
 		config_record->next = prev_config_record;
-
 		prev_config_record = config_record;
 	}
 
