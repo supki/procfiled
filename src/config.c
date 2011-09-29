@@ -94,21 +94,15 @@ config_record_t * read_config( config_t * config )
 		return NULL;
 	}
 
-	config_record_t * config_head, * config_prev, * config_next;
-	config_head = read_config_record( config );
-	if ( config_head )
+	config_record_t * prev_config_record = NULL, * config_record;
+	while ( ( config_record = read_config_record( config ) ) != NULL )
 	{
-		config_prev = config_head;
-		do
-		{
-			config_next = read_config_record( config );
-			config_prev->next = config_next;
-			config_prev = config_next;
-		}
-		while ( config_next != NULL );
+		config_record->next = prev_config_record;
+
+		prev_config_record = config_record;
 	}
 
-	return config_head;
+	return prev_config_record;
 }
 
 static void print_config_record( config_record_t * record )
