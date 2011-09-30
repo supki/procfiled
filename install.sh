@@ -17,12 +17,16 @@ while [ $# -ge 1 ]; do
 			uninstall_flag="y"
 			shift
 			;;
+
+		* )
+			shift
+			;;
 	esac
 done
 
 if [ -z "${dir}" ]; then
 	echo "$0 [--uninstall] --dir DIRECTORY"
-	exit -1
+	exit 1
 fi
 
 if [ -z "${uninstall_flag}" ]; then
