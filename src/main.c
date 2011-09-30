@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <signal.h>
@@ -64,8 +65,18 @@ void kill_daemon( void )
 	exit( EXIT_SUCCESS );
 }
 
+void signal_handler( int signal )
+{
+	(void) signal;
+}
+
 void daemonize( void )
 {
+	signal(SIGHUP, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+
 	pid_t pid = fork( );
 	if ( pid < 0 ) exit( EXIT_FAILURE );
 	if ( pid > 0 ) exit( EXIT_SUCCESS );
@@ -114,6 +125,7 @@ int main( int argc, char * argv[] )
 		int length = read( inotify_instance, (void *)buffer, EVENT_BUF_LEN );
 		if ( length < 0 )
 		{
+			if ( errno == EINTR ) continue;
 			return EXIT_FAILURE;
 		}
 
