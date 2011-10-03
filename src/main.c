@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <fcntl.h>
-#include <fnmatch.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
@@ -92,7 +92,6 @@ void daemonize( void )
 	umask( 0 );
 
 	if ( setsid( ) < 0 ) exit( EXIT_FAILURE );
-
 	if ( ( chdir( "/" ) ) < 0 ) exit( EXIT_FAILURE );
 
 	close( STDIN_FILENO );
@@ -128,9 +127,7 @@ int main( int argc, char * argv[] )
 	save_pid( );
 
 	int inotify_instance = inotify_init( );
-
-	watch_record_t * watch_head = init_watches( config_file, inotify_instance );
-	print_watches( watch_head );
+	init_watches( config_file, inotify_instance );
 
 	char buffer[ EVENT_BUF_LEN ];
 	while ( 1 )
@@ -145,26 +142,7 @@ int main( int argc, char * argv[] )
 		for ( int i = 0; i < length; i += EVENT_SIZE + ( (struct inotify_event *) &buffer[ i ] )->len )
 		{
 			struct inotify_event * event = (struct inotify_event *) &buffer[ i ];
-
-			for_each( watch_record_t, watch_head, watch_record )
-			{
-				if ( ( watch_record->wd != event->wd ) || !( event->len ) )
-				{
-					continue;
-				}
-
-				if ( !fnmatch( watch_record->info->pattern, event->name, 0 ) )
-				{
-					char * old_path = construct_path( watch_record->info->source_path, event->name );
-					char * new_path = construct_path( watch_record->info->destination_path, event->name );
-
-					printf( "%s -> %s\n", old_path, new_path );
-					rename( old_path, new_path );
-
-					destroy_path( old_path );
-					destroy_path( new_path );
-				}
-			}
+			parse_inotify_event( event );
 		}
 	}
 
