@@ -1,3 +1,5 @@
+SOFTWARE = mtd
+
 CCFLAGS = -std=gnu99 -Wall -Werror -Wextra -O99 -Os
 
 OBJDIR = obj
