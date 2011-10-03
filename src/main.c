@@ -16,9 +16,6 @@
 #define EVENT_SIZE    ( sizeof (struct inotify_event) )
 #define EVENT_BUF_LEN ( 1024 * ( EVENT_SIZE + 16 ) )
 
-#define for_each(type, head, item) \
-    for(type * item = head; item != NULL; item = item->next)
-
 #define MAX_PID_LENGTH 5
 
 static int print_version_mode = 0;
