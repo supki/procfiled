@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <unistd.h>
 #include <wordexp.h>
 
@@ -123,16 +124,8 @@ config_record_t * read_config( config_t * config )
 	return prev_config_record;
 }
 
-static void print_config_record( config_record_t * record )
+void log_config_record( config_record_t * record )
 {
-	printf( "%s %s:\n%s -> %s\n",
+	syslog( LOG_INFO, "%s %s from %s to %s",
 		record->command, record->pattern, record->source_path, record->destination_path );
-}
-
-void print_config( config_record_t * config_head )
-{
-	for_each( config_record_t, config_head, config_record )
-	{
-		print_config_record( config_record );
-	}
 }
