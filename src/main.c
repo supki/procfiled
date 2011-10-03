@@ -19,6 +19,8 @@
 #define for_each(type, head, item) \
     for(type * item = head; item != NULL; item = item->next)
 
+#define MAX_PID_LENGTH 5
+
 static int print_version_mode = 0;
 static int kill_daemon_mode = 0;
 static int daemon_mode = 1;
@@ -58,9 +60,12 @@ void print_version( void )
 void kill_daemon( void )
 {
 	int fd = open( construct_path( expand_path( "~" ), ".mtdpid" ), O_RDONLY );
-	int pid;
-	read( fd, &pid, sizeof( pid ) );
+	char line[ MAX_PID_LENGTH + 1 ];
+	read( fd, &line, sizeof( line ) );
 	close( fd );
+
+	int pid;
+	sscanf( line, "%d", &pid );
 	kill( pid, 9 );
 	exit( EXIT_SUCCESS );
 }
@@ -99,9 +104,12 @@ void set_default_config_name( void )
 
 void save_pid( void )
 {
+	char pid[ MAX_PID_LENGTH + 1 ];
+	int length = snprintf( pid, sizeof( pid ), "%d", getpid( ) );
+	pid[length] = '\n';
+
 	int fd = open( construct_path( expand_path( "~" ), ".mtdpid" ), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
-	int pid = getpid( );
-	write( fd, &pid, sizeof( pid ) );
+	write( fd, &pid, length + 1 );
 	close( fd );
 }
 
