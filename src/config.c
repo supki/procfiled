@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "command.h"
 #include "attribute.h"
 #include "path.h"
 
@@ -12,13 +13,6 @@
 config_t * open_config( const char * path )
 {
 	return fopen( path, "r" );
-}
-
-int copy( const char * old_name, const char * new_name )
-{
-	(void) old_name;
-	(void) new_name;
-	return 0;
 }
 
 static int (*set_function_by_name( const char * name ))( const char *, const char * )

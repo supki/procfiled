@@ -10,6 +10,7 @@ OBJFILES = \
 $(OBJDIR)/daemonize.o \
 $(OBJDIR)/path.o \
 $(OBJDIR)/attribute.o \
+$(OBJDIR)/command.o \
 $(OBJDIR)/config.o \
 $(OBJDIR)/watches.o \
 $(OBJDIR)/main.o \
