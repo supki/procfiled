@@ -6,12 +6,14 @@ What is MTD?
 Move Torrent Daemon is a daemon, that automatically works with files. It could manage your ~/Downloads directory, for example. Consider:
 ###config example###
 	$ cat ~/.mtdconf
-	move	*.torrent	~/Downloads	~/Downloads/.torrents
+	move	*.torrent	~/Downloads	~/.torrents
 	move	*.png		~/Downloads	~/Pictures
 	move	*.jpg		~/Downloads	~/Pictures
 	move	*.gif		~/Downloads	~/Pictures
 	link	*.avi		~/Downloads	~/Videos
 	link	*.mp4		~/Downloads	~/Videos
+	copy	*.chm		~/Downloads	~/Dropbox/books
+	copy	*.pdf		~/Downloads	~/Dropbox/books
 
 What about licensing?
 ---------------------
@@ -46,10 +48,10 @@ What is implemented?
 --------------------
 * `move` command
 * `link` command
+* `copy` command
 
 What will be implemented?
 -------------------------
-* `copy` command
 * auto-updating daemon after configuration file change
 
 Who did this?
