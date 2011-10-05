@@ -21,21 +21,12 @@ int copy( const char * old_name, const char * new_name )
 	return 0;
 }
 
-static void set_function_by_name( config_record_t * record )
+static int (*set_function_by_name( const char * name ))( const char *, const char * )
 {
-	record->function = NULL;
-	if ( !strcmp( record->name, "move" ) )
-	{
-		record->function = rename;
-	}
-	if ( !strcmp( record->name, "link" ) )
-	{
-		record->function = symlink;
-	}
-	if ( !strcmp( record->name, "copy" ) )
-	{
-		record->function = copy;
-	}
+	if ( !strcmp( name, "move" ) ) return rename;
+	if ( !strcmp( name, "link" ) ) return symlink;
+	if ( !strcmp( name, "copy" ) ) return copy;
+	return NULL;
 }
 
 static config_record_t * read_next_record( config_t * config )
@@ -47,7 +38,7 @@ static config_record_t * read_next_record( config_t * config )
 
 	config_record_t * record = malloc( sizeof( config_record_t ) );
 	record->name = construct_next_attribute( mode_attribute );
-	set_function_by_name( record );
+	record->function = set_function_by_name( record->name );
 	record->pattern = construct_next_attribute( mode_attribute );
 	record->source_path = construct_next_attribute( path_attribute );
 	record->destination_path = construct_next_attribute( path_attribute );
