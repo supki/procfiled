@@ -8,19 +8,19 @@
 #define SYMBOL_TAB   '	'
 
 static unsigned int current_position = 0;
-static char * attribute_line = NULL;
+static char * attributes_line = NULL;
 
-void init_attribute_line( char * line )
+void init_attributes_line( char * line )
 {
-	attribute_line = line;
+	attributes_line = line;
 	current_position = 0;
 }
 
 static int eat_whitespaces( unsigned int position )
 {
-	while( ( attribute_line[ position ] == SYMBOL_SPACE ||
-		attribute_line[ position ] == SYMBOL_TAB ) &&
-		position < strlen( attribute_line ) )
+	while( ( attributes_line[ position ] == SYMBOL_SPACE ||
+		attributes_line[ position ] == SYMBOL_TAB ) &&
+		position < strlen( attributes_line ) )
 	{
 		position++;
 	}
@@ -30,9 +30,9 @@ static int eat_whitespaces( unsigned int position )
 
 static int eat_not_whitespaces( unsigned int position )
 {
-	while( attribute_line[ position ] != SYMBOL_SPACE &&
-		attribute_line[ position ] != SYMBOL_TAB &&
-		position < strlen( attribute_line ) )
+	while( attributes_line[ position ] != SYMBOL_SPACE &&
+		attributes_line[ position ] != SYMBOL_TAB &&
+		position < strlen( attributes_line ) )
 	{
 		position++;
 	}
@@ -60,8 +60,8 @@ char * path_attribute( char * line, unsigned int length )
 char * construct_next_attribute( char * (*get_attribute)(char *, unsigned int ) )
 {
 	unsigned int start_position = eat_whitespaces( current_position );
-	if ( start_position == strlen( attribute_line ) ) return NULL;
+	if ( start_position == strlen( attributes_line ) ) return NULL;
 	current_position = eat_not_whitespaces( start_position );
 
-	return get_attribute( attribute_line + start_position, current_position - start_position );
+	return get_attribute( attributes_line + start_position, current_position - start_position );
 }

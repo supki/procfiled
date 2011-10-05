@@ -19,7 +19,7 @@ static config_record_t * read_next_record( config_t * config )
 	char line[BUFSIZ];
 	if ( line != fgets( line, BUFSIZ, config ) ) return NULL;
 	line[ strlen( line ) - 1 ] = '\0';
-	init_attribute_line( line );
+	init_attributes_line( line );
 
 	config_record_t * record = (config_record_t *) malloc( sizeof( config_record_t ) );
 	record->command = construct_next_attribute( mode_attribute );
