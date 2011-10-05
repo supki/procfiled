@@ -1,5 +1,5 @@
-#ifndef _MTD_CONFIG_RECORD_H_
-#define _MTD_CONFIG_RECORD_H_
+#ifndef _MTD_CONFIG_H_
+#define _MTD_CONFIG_H_
 
 #include <stdio.h>
 
@@ -18,4 +18,4 @@ typedef FILE config_t;
 config_t * open_config( const char * path );
 config_record_t * read_config( FILE * fstream );
 
-#endif /* #define _MTD_CONFIG_RECORD_H_ */
+#endif /* #define _MTD_CONFIG_H_ */
