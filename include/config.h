@@ -6,7 +6,8 @@
 typedef struct config_record_s
 {
 	int watch_instance;
-	const char * command;
+	const char * name;
+	int (*function)( const char * old_name, const char * new_name );
 	const char * pattern;
 	const char * source_path;
 	const char * destination_path;

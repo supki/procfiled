@@ -7,7 +7,7 @@
 
 char * construct_path( const char * dir_name, const char * file_name )
 {
-	char * path = (char *) malloc( strlen( dir_name ) + strlen( file_name ) + 2 ); 
+	char * path = malloc( strlen( dir_name ) + strlen( file_name ) + 2 ); 
 	strcpy( path, dir_name);
 	strcat( path, "/" );
 	strcat( path, file_name );
@@ -22,7 +22,7 @@ void destroy_path( char * path )
 
 char * expand_path( char * path )
 {
-	char * expanded = (char *) malloc ( BUFSIZ );
+	char * expanded = malloc ( BUFSIZ );
 
 	wordexp_t wordexp_buffer;
 	wordexp( path, &wordexp_buffer, 0 );
