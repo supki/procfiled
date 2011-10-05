@@ -10,8 +10,8 @@ Move Torrent Daemon is a daemon, that automatically works with files. It could m
 	move	*.png		~/Downloads	~/Pictures
 	move	*.jpg		~/Downloads	~/Pictures
 	move	*.gif		~/Downloads	~/Pictures
-	move	*.avi		~/Downloads	~/Videos
-	move	*.mp4		~/Downloads	~/Videos
+	link	*.avi		~/Downloads	~/Videos
+	link	*.mp4		~/Downloads	~/Videos
 
 What about licensing?
 ---------------------
@@ -37,20 +37,19 @@ Second, you need to start daemon:
 
 That's all!
 
-###useful options###
+###options###
 * `--kill` - Kill the currently running MTD session.
-* `--no-daemon` -	Don't detach from console.
 * `--conf FILE` -	Read configuration options from file. ~/.mtdconf is used by default
 * `--version` - Display version information and exit.
 
 What is implemented?
 --------------------
 * `move` command
+* `link` command
 
 What will be implemented?
 -------------------------
 * `copy` command
-* `link` command
 * auto-updating daemon after configuration file change
 
 Who did this?
