@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include "path.h"
-#include "config_record.h"
+#include "config.h"
 #include "watches.h"
 
 #define for_each(type, head, item) \

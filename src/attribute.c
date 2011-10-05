@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config_attribute.h"
+#include "attribute.h"
 #include "path.h"
 
 #define SYMBOL_SPACE ' '

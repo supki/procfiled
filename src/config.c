@@ -2,8 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "config_record.h"
-#include "config_attribute.h"
+#include "config.h"
+#include "attribute.h"
 #include "path.h"
 
 #define for_each(type, head, item) \
