@@ -1,9 +1,11 @@
 #include <fcntl.h>
+#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -35,7 +37,6 @@ static void kill_daemon( void )
 	int pid;
 	sscanf( line, "%d", &pid );
 	if ( kill( pid, SIGTERM ) < 0 ) exit( EXIT_FAILURE );
-	if ( unlink( pid_file ) < 0 ) exit( EXIT_FAILURE );
 	exit( EXIT_SUCCESS );
 }
 
@@ -79,8 +80,12 @@ static void save_pid( void )
 	char * pid_file = construct_path( expand_path( "~" ), ".mtdpid" );
 	int fd = open( pid_file, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
 	destroy_path( pid_file );
+	if ( flock( fd, LOCK_EX | LOCK_NB ) )
+	{
+		syslog( LOG_INFO, "PID file locking is failed, possibly another mtd instance is runniing. Aborting.." );
+		exit( EXIT_FAILURE );
+	}
 	write( fd, &pid, length + 1 );
-	close( fd );
 
 }
 static void log_init( void )
