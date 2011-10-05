@@ -3,7 +3,7 @@
 #include <sys/inotify.h>
 
 #include "daemonize.h" 
-#include "watch.h"
+#include "watches.h"
 
 #define for_each_inotify_event( events, length ) \
 	for ( int i = 0; i < length; i += EVENT_SIZE + ( (struct inotify_event *) &events[ i ] )->len )

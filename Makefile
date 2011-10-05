@@ -9,8 +9,9 @@ INCDIR = include
 OBJFILES = \
 $(OBJDIR)/daemonize.o \
 $(OBJDIR)/path.o \
-$(OBJDIR)/config.o \
-$(OBJDIR)/watch.o \
+$(OBJDIR)/config_attribute.o \
+$(OBJDIR)/config_record.o \
+$(OBJDIR)/watches.o \
 $(OBJDIR)/main.o \
 
 all: $(OBJFILES)

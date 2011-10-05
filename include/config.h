@@ -1,10 +1,11 @@
-#ifndef _MTD_CONFIG_H_
-#define _MTD_CONFIG_H_
+#ifndef _MTD_CONFIG_RECORD_H_
+#define _MTD_CONFIG_RECORD_H_
 
 #include <stdio.h>
 
 typedef struct config_record_s
 {
+	int watch_instance;
 	const char * command;
 	const char * pattern;
 	const char * source_path;
@@ -16,6 +17,5 @@ typedef FILE config_t;
 
 config_t * open_config( const char * path );
 config_record_t * read_config( FILE * fstream );
-void log_config_record( config_record_t * record );
 
-#endif /* #define _MTD_CONFIG_H_ */
+#endif /* #define _MTD_CONFIG_RECORD_H_ */
