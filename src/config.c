@@ -15,8 +15,14 @@ config_t * open_config( const char * path )
 	return fopen( path, "r" );
 }
 
+void close_config( config_t * config )
+{
+	fclose( config );
+}
+
 static int (*set_function_by_name( const char * name ))( const char *, const char * )
 {
+	if ( !name ) return NULL;
 	if ( !strcmp( name, "move" ) ) return rename;
 	if ( !strcmp( name, "link" ) ) return symlink;
 	if ( !strcmp( name, "copy" ) ) return copy;
@@ -56,11 +62,24 @@ static void destroy_record( config_record_t * config_record )
 	if ( config_record->source_path ) free( (void *)config_record->source_path );
 	if ( config_record->destination_path ) free( (void *)config_record->destination_path );
 	free( config_record );
+	config_record = NULL;
+}
+
+void destroy_config( config_record_t * config_head )
+{
+	config_record_t * config_record = config_head;
+	while( config_record != NULL )
+	{
+		config_record_t * next = config_record->next;
+		destroy_record( config_record );
+		config_record = next;
+	}
 }
 
 config_record_t * read_config( config_t * config )
 {
 	if ( !config ) return NULL;
+	rewind( config );
 
 	config_record_t * prev_record = NULL, * record;
 	while ( ( record = read_next_record( config ) ) != NULL )

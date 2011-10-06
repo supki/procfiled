@@ -17,8 +17,8 @@ int copy( const char * old_name, const char * new_name )
 
 	if ( sendfile( target, source, NULL, stat_buf.st_size ) == -1 ) return -1;
 
-	close (source);
-	close (target);
+	close( source );
+	close( target );
 
 	return 0;
 }

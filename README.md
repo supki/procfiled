@@ -12,8 +12,8 @@ Move Torrent Daemon is a daemon, that automatically works with files. It could m
 	move	*.gif		~/Downloads	~/Pictures
 	link	*.avi		~/Downloads	~/Videos
 	link	*.mp4		~/Downloads	~/Videos
-	copy	*.chm		~/Downloads	~/Dropbox/books
-	copy	*.pdf		~/Downloads	~/Dropbox/books
+	copy	*.chm		~/Downloads	~/Dropbox/Books
+	copy	*.pdf		~/Downloads	~/Dropbox/Books
 
 What about licensing?
 ---------------------
@@ -46,13 +46,13 @@ That's all!
 
 What is implemented?
 --------------------
+* auto-updating daemon after configuration file change
 * `move` command
 * `link` command
 * `copy` command
 
 What will be implemented?
 -------------------------
-* auto-updating daemon after configuration file change
 
 Who did this?
 -------------
