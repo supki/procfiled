@@ -29,14 +29,26 @@ static void kill_daemon( void )
 {
 	char * pid_file = construct_path( expand_path( "~" ), ".mtdpid" );
 	int fd = open( pid_file, O_RDONLY );
-	if ( fd < 0 ) exit( EXIT_FAILURE );
+	if ( fd < 0 )
+	{
+		printf( "ERROR: Cannot open PID file!\n" );
+		exit( EXIT_FAILURE );
+	}
 	char line[ MAX_PID_LENGTH + 1 ];
-	read( fd, &line, sizeof( line ) );
+	if ( read( fd, &line, sizeof( line ) ) == -1 )
+	{
+		printf( "ERROR: Cannot read from PID file!\n" );
+		exit( EXIT_FAILURE );
+	}
 	close( fd );
 
 	int pid;
 	sscanf( line, "%d", &pid );
-	if ( kill( pid, SIGTERM ) < 0 ) exit( EXIT_FAILURE );
+	if ( kill( pid, SIGTERM ) < 0 )
+	{
+		printf( "ERROR: Cannot kill PID process!\n" );
+		exit( EXIT_FAILURE );
+	}
 	exit( EXIT_SUCCESS );
 }
 
@@ -48,14 +60,18 @@ void get_options( int argc, char * argv[] )
 		{
 			print_version( );
 		}
-		if ( !strcmp( argv[i], "--kill" ) )
+		else if ( !strcmp( argv[i], "--kill" ) )
 		{
 			kill_daemon( );
 		}
-		if ( !strcmp( argv[i], "--conf" ) )
+		else if ( !strcmp( argv[i], "--conf" ) )
 		{
 			config_file = expand_path( argv[ ++i ] );
 			default_config = 0;
+		}
+		else
+		{
+			syslog( LOG_NOTICE, "Unknown option: %s", argv[i] );
 		}
 	}
 }
@@ -79,13 +95,22 @@ static void save_pid( void )
 
 	char * pid_file = construct_path( expand_path( "~" ), ".mtdpid" );
 	int fd = open( pid_file, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
+	if ( fd < 0 )
+	{
+		syslog( LOG_ERR, "ERROR: Cannot open PID file!" );
+		exit( EXIT_FAILURE );
+	}
 	destroy_path( pid_file );
 	if ( flock( fd, LOCK_EX | LOCK_NB ) )
 	{
-		syslog( LOG_INFO, "PID file locking is failed, possibly another mtd instance is runniing. Aborting.." );
+		syslog( LOG_ERR, "PID file locking is failed (another mtd instance is running?)." );
 		exit( EXIT_FAILURE );
 	}
-	write( fd, &pid, length + 1 );
+	if ( write( fd, &pid, length + 1 ) == -1 )
+	{
+		syslog( LOG_ERR, "ERROR: Cannot write to PID file!" );
+		exit( EXIT_FAILURE );
+	}
 
 }
 static void log_init( void )
@@ -106,7 +131,11 @@ void daemonize( void )
 	signal(SIGQUIT, signal_ignore_handler);
 
 	pid_t pid = fork( );
-	if ( pid < 0 ) exit( EXIT_FAILURE );
+	if ( pid < 0 )
+	{
+		printf( "ERROR: Cannot daemonize!\n" );
+		exit( EXIT_FAILURE );
+	}
 	if ( pid > 0 ) exit( EXIT_SUCCESS );
 
 	umask( 0 );
@@ -115,8 +144,16 @@ void daemonize( void )
 	setlogmask( LOG_UPTO( LOG_INFO ) );
 	openlog( DAEMON_NAME, LOG_CONS, LOG_USER );
 
-	if ( setsid( ) < 0 ) exit( EXIT_FAILURE );
-	if ( ( chdir( "/" ) ) < 0 ) exit( EXIT_FAILURE );
+	if ( setsid( ) < 0 )
+	{
+		syslog( LOG_ERR, "Cannot set daemon session leader!" );
+		exit( EXIT_FAILURE );
+	}
+	if ( ( chdir( "/" ) ) < 0 )
+	{
+		syslog( LOG_ERR, "Cannot change working directory to /" );
+		exit( EXIT_FAILURE );
+	}
 
 	close( STDIN_FILENO );
 	close( STDOUT_FILENO );

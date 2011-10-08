@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stdlib.h>
+#include <syslog.h>
 #include <sys/inotify.h>
 
 #include "daemonize.h" 
@@ -20,7 +21,11 @@ int main( int argc, char * argv[] )
 		int length = get_inotify_events( events );
 		if ( length < 0 )
 		{
-			if ( errno == EINTR ) continue;
+			if ( errno == EINTR )
+			{
+				syslog( LOG_NOTICE, "Inotify events read function was interrupted, probably OS was going to suspend." );
+				continue;
+			}
 			break;
 		}
 
