@@ -26,9 +26,11 @@ MTD is licensed under GPLv3
 How to install (or uninstall) MTD?
 ----------------------------------
 ###install###
+	$ DIR="/usr/local/bin"
 	$ ./install.sh --dir=${DIR}
 	$ mtd
 ###uninstall###
+	$ DIR="/usr/local/bin"
 	$ ./install.sh --uninstall --dir=${DIR}
 
 How to use it?
