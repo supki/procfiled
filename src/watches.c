@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
-#include <syslog.h>
 #include <unistd.h>
 
 #include "path.h"
+#include "logger.h"
 #include "config.h"
 #include "watches.h"
 
@@ -29,7 +29,7 @@ static void add_watches( void )
 	for_each( config_record_t, config_head, config_record )
 	{
 		config_record->watch_instance = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_MODIFY | IN_MOVED_TO );
-		syslog( LOG_INFO, "+ %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
+		log_info( "+ %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
 	}
 }
 
@@ -38,7 +38,7 @@ static void remove_watches( void )
 	for_each( config_record_t, config_head, config_record )
 	{
 		inotify_rm_watch( inotify_instance, config_record->watch_instance );
-		syslog( LOG_INFO, "- %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
+		log_info( "- %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
 	}
 	destroy_config( config_head );
 	inotify_rm_watch( inotify_instance, config_watch_instance );
@@ -79,9 +79,9 @@ void parse_inotify_event( struct inotify_event * event )
 
 			if ( config_record->function( old_name, new_name ) == -1 )
 			{
-				syslog( LOG_ERR, "daemon failed to %s: %s", config_record->name, strerror( errno ) );
+				log_warning( "daemon failed to %s: %s", config_record->name, strerror( errno ) );
 			}
-			syslog( LOG_NOTICE, "%s %s to %s", config_record->name, old_name, new_name );
+			log_notice( "%s %s to %s", config_record->name, old_name, new_name );
 
 			destroy_path( old_name );
 			destroy_path( new_name );

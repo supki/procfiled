@@ -47,6 +47,7 @@ That's all!
 
 ###options###
 * `--kill` - Kill the currently running MTD session.
+* `--foreground (-f)` - Don't detach from console.
 * `--conf FILE` - Read configuration options from file. ~/.mtdconf is used by default
 * `--version` - Display version information and exit.
 
@@ -59,7 +60,6 @@ What is implemented?
 
 What will be implemented?
 -------------------------
-* `--foreground` option for easier debugging
 * `--pidfile` option for embedding mtd in debian daemon system
 
 Who did this?
