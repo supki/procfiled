@@ -28,7 +28,7 @@ static void add_watches( void )
 	config_watch_instance = inotify_add_watch( inotify_instance, config_name, IN_MODIFY );
 	for_each( config_record_t, config_head, config_record )
 	{
-		config_record->watch_instance = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_MODIFY );
+		config_record->watch_instance = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_MODIFY | IN_MOVED_TO );
 		syslog( LOG_INFO, "+ %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
 	}
 }
