@@ -10,10 +10,12 @@ Move Torrent Daemon is a daemon, that automatically works with files. It could m
 	move	*.png		~/Downloads	~/Pictures
 	move	*.jpg		~/Downloads	~/Pictures
 	move	*.gif		~/Downloads	~/Pictures
-	link	*.avi		~/Downloads	~/Videos
-	link	*.mp4		~/Downloads	~/Videos
+	move	*.avi		~/Downloads	~/Videos
+	move	*.mp4		~/Downloads	~/Videos
 	copy	*.chm		~/Downloads	~/Dropbox/Books
 	copy	*.pdf		~/Downloads	~/Dropbox/Books
+
+	link	*HD*		~/Videos	~/Videos/HD
 
 MTD is based on Inotify subsystem, so you need Linux Kernal >= 2.6.13 and glibc >= 2.4
 
