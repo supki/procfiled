@@ -1,9 +1,9 @@
 #include <errno.h>
 #include <stdlib.h>
-#include <syslog.h>
 #include <sys/inotify.h>
 
 #include "daemonize.h" 
+#include "logger.h"
 #include "watches.h"
 
 #define for_each_inotify_event( events, length ) \
@@ -23,7 +23,7 @@ int main( int argc, char * argv[] )
 		{
 			if ( errno == EINTR )
 			{
-				syslog( LOG_NOTICE, "Inotify events read function was interrupted, probably OS was going to suspend." );
+				log_notice( "Inotify events read function was interrupted, probably OS was going to suspend." );
 				continue;
 			}
 			break;
