@@ -1,3 +1,4 @@
+#include <err.h>
 #include <fnmatch.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -76,7 +77,10 @@ void parse_inotify_event( struct inotify_event * event )
 			char * old_name = construct_path( config_record->source_path, event->name );
 			char * new_name = construct_path( config_record->destination_path, event->name );
 
-			config_record->function( old_name, new_name );
+			if ( config_record->function( old_name, new_name ) == -1 )
+			{
+				syslog( LOG_ERR, "daemon failed to %s: %s", config_record->name, strerror( errno ) );
+			}
 			syslog( LOG_NOTICE, "%s %s to %s", config_record->name, old_name, new_name );
 
 			destroy_path( old_name );

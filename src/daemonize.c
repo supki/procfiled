@@ -1,3 +1,4 @@
+#include <err.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <signal.h>
@@ -31,14 +32,12 @@ static void kill_daemon( void )
 	int fd = open( pid_file, O_RDONLY );
 	if ( fd < 0 )
 	{
-		printf( "ERROR: Cannot open PID file!\n" );
-		exit( EXIT_FAILURE );
+		err( EXIT_FAILURE, "Cannot open PID file" );
 	}
 	char line[ MAX_PID_LENGTH + 1 ];
 	if ( read( fd, &line, sizeof( line ) ) == -1 )
 	{
-		printf( "ERROR: Cannot read from PID file!\n" );
-		exit( EXIT_FAILURE );
+		err( EXIT_FAILURE, "Cannot read from PID file" );
 	}
 	close( fd );
 
@@ -46,8 +45,7 @@ static void kill_daemon( void )
 	sscanf( line, "%d", &pid );
 	if ( kill( pid, SIGTERM ) < 0 )
 	{
-		printf( "ERROR: Cannot kill PID process!\n" );
-		exit( EXIT_FAILURE );
+		err( EXIT_FAILURE, "Cannot kill PID process" );
 	}
 	exit( EXIT_SUCCESS );
 }
@@ -133,8 +131,7 @@ void daemonize( void )
 	pid_t pid = fork( );
 	if ( pid < 0 )
 	{
-		printf( "ERROR: Cannot daemonize!\n" );
-		exit( EXIT_FAILURE );
+		err( EXIT_FAILURE, "Cannot daemonize" );
 	}
 	if ( pid > 0 ) exit( EXIT_SUCCESS );
 
