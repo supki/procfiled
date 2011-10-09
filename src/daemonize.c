@@ -1,5 +1,6 @@
 #include <err.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -52,24 +53,37 @@ static void kill_daemon( void )
 
 void get_options( int argc, char * argv[] )
 {
-	for( int i = 1; i < argc; i++ )
+	struct option long_options[] = {
+	{"version",    no_argument,       0,  1 },
+	{"kill",       no_argument,       0,  2 },
+	{"conf",       required_argument, 0,  3 },
+	{0,            0,                 0,  0 }
+	};
+	while ( 1 )
 	{
-		if ( !strcmp( argv[i], "--version" ) )
+		int c = getopt_long( argc, argv, "0123:", long_options, NULL );
+		if ( c == -1 )
 		{
+			break;
+		}
+
+		switch ( c )
+		{
+		case 1:
 			print_version( );
-		}
-		else if ( !strcmp( argv[i], "--kill" ) )
-		{
+			break;
+
+		case 2:
 			kill_daemon( );
-		}
-		else if ( !strcmp( argv[i], "--conf" ) )
-		{
-			config_file = expand_path( argv[ ++i ] );
+			break;
+
+		case 3:
+			config_file = expand_path( optarg );
 			default_config = 0;
-		}
-		else
-		{
-			syslog( LOG_NOTICE, "Unknown option: %s", argv[i] );
+			break;
+
+		case '?':
+			break;
 		}
 	}
 }
