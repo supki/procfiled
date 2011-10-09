@@ -15,6 +15,8 @@ Move Torrent Daemon is a daemon, that automatically works with files. It could m
 	copy	*.chm		~/Downloads	~/Dropbox/Books
 	copy	*.pdf		~/Downloads	~/Dropbox/Books
 
+MTD is based on Inotify subsystem, so you need Linux Kernal >= 2.6.13 and glibc >= 2.4
+
 What about licensing?
 ---------------------
 MTD is licensed under GPLv3
