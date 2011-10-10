@@ -8,10 +8,10 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <wordexp.h>
 
 #include "daemonize.h"
 #include "logger.h"
-#include "path.h"
 
 #define MAX_PID_LENGTH 5
 
@@ -21,28 +21,26 @@ static char * config_file = NULL;
 static int default_pidfile = 1;
 static char * pid_file = NULL;
 
-static char * get_pidfile_name( void )
+static char * expand_path( char * path )
+{
+	wordexp_t wordexp_buffer;
+	wordexp( path, &wordexp_buffer, 0 );
+	char * expanded = strdup( wordexp_buffer.we_wordv[0] );
+	wordfree( &wordexp_buffer );
+
+	return expanded;
+}
+
+static char * get_pidfile_path( void )
 {
 	if ( default_pidfile )
 	{
 		pid_file = ( getuid( ) == 0 ) ?
-			construct_path( "/var/run" , "mtd.pid" ):
-			construct_path( expand_path( "~" ), ".mtdpid" );
+			strdup( "/var/run/mtd.pid" ):
+			expand_path( "~/.mtdpid" );
 	}
 
 	return pid_file;
-}
-
-char * get_config_name( void )
-{
-	if ( default_config )
-	{
-		config_file = ( getuid( ) == 0 ) ?
-			construct_path( "/etc" , "mtd.conf" ):
-			construct_path( expand_path( "~" ), ".mtdconf" );
-	}
-
-	return config_file;
 }
 
 static void print_version( void )
@@ -53,12 +51,13 @@ static void print_version( void )
 
 static void kill_daemon( void )
 {
-	char * pid_file = get_pidfile_name( );
+	char * pid_file = get_pidfile_path( );
 	int fd = open( pid_file, O_RDONLY );
 	if ( fd < 0 )
 	{
-		log_error_and_exit( "Cannot open PID file" );
+		log_error_and_exit( "Cannot open PID file %s", pid_file );
 	}
+	free( pid_file );
 	char line[ MAX_PID_LENGTH + 1 ];
 	if ( read( fd, &line, sizeof( line ) ) == -1 )
 	{
@@ -70,7 +69,7 @@ static void kill_daemon( void )
 	sscanf( line, "%d", &pid );
 	if ( kill( pid, SIGTERM ) < 0 )
 	{
-		log_error_and_exit( "Cannot kill PID process" );
+		log_error_and_exit( "Cannot kill %d process", pid );
 	}
 
 	exit( EXIT_SUCCESS );
@@ -105,12 +104,12 @@ void get_options( int argc, char * argv[] )
 			break;
 
 		case 3:
-			config_file = optarg;
+			config_file = strdup( optarg );
 			default_config = 0;
 			break;
 
 		case 4:
-			pid_file = optarg;
+			pid_file = strdup( optarg );
 			default_pidfile = 0;
 			break;
 
@@ -141,13 +140,13 @@ static void save_pid( void )
 	int length = snprintf( pid, sizeof( pid ), "%d", getpid( ) );
 	pid[length] = '\n';
 
-	char * pid_file = get_pidfile_name( );
-	log_info( "pidfile %s", pid_file );
+	char * pid_file = get_pidfile_path( );
 	int fd = open( pid_file, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
 	if ( fd < 0 )
 	{
-		log_error_and_exit( "Cannot open PID file" );
+		log_error_and_exit( "Cannot open PID file %s", pid_file );
 	}
+	free( pid_file );
 	if ( flock( fd, LOCK_EX | LOCK_NB ) )
 	{
 		log_error_and_exit( "PID file locking is failed (another mtd instance is running?)." );
@@ -183,4 +182,16 @@ void daemonize( void )
 	atexit( log_end );
 
 	save_pid( );
+}
+
+char * get_configfile_path( void )
+{
+	if ( default_config )
+	{
+		config_file = ( getuid( ) == 0 ) ?
+			strdup( "/etc/mtd.conf" ):
+			expand_path( "~/.mtdconf" );
+	}
+
+	return config_file;
 }

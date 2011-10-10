@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wordexp.h>
 
 #include "attribute.h"
-#include "path.h"
 
 #define SYMBOL_SPACE ' '
 #define SYMBOL_TAB   '	'
@@ -42,19 +43,18 @@ static int eat_not_whitespaces( unsigned int position )
 
 char * mode_attribute( char * line, unsigned int length )
 {
-	char * attribute = malloc( length + 1 );
-	strncpy( attribute, line, length );
-	attribute[ length ] = '\0';
-	return attribute;
+	return strndup( line, length );
 }
 
 char * path_attribute( char * line, unsigned int length )
 {
-	char attribute[ length + 1 ];
-	strncpy( attribute, line, length );
-	attribute[ length ] = '\0';
+	(void) length;
+	wordexp_t wordexp_buffer;
+	wordexp( line, &wordexp_buffer, 0 );
+	char * expanded = strdup( wordexp_buffer.we_wordv[0] );
+	wordfree( &wordexp_buffer );
 
-	return expand_path( attribute );
+	return expanded;
 }
 
 char * construct_next_attribute( char * (*get_attribute)(char *, unsigned int ) )

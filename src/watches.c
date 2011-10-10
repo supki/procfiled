@@ -6,7 +6,6 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "path.h"
 #include "logger.h"
 #include "config.h"
 #include "watches.h"
@@ -22,13 +21,13 @@ static config_record_t * config_head = NULL;
 static void add_watches( void )
 {
 	sleep( 1 ); /* avoid too smart editor problem */
-	config_t * config = open_config( config_name );
+	config_t * config = fopen( config_name, "r" );
 	if ( config == NULL )
 	{
 		log_error_and_exit( "Cannot open config file %s", config_name );
 	}
 	config_head = read_config( config );
-	close_config( config );
+	fclose( config );
 	config_watch_instance = inotify_add_watch( inotify_instance, config_name, IN_MODIFY );
 	for_each( config_record_t, config_head, config_record )
 	{
@@ -60,6 +59,16 @@ int get_inotify_events( char * events )
 	return read( inotify_instance, (void *)events, EVENT_BUF_LEN );
 }
 
+static char * construct_path( const char * dir_name, const char * file_name )
+{
+	char * path = malloc( strlen( dir_name ) + strlen( file_name ) + 2 ); 
+	strcpy( path, dir_name);
+	strcat( path, "/" );
+	strcat( path, file_name );
+
+	return path;
+}
+
 void parse_inotify_event( struct inotify_event * event )
 {
 	if ( event->wd == config_watch_instance )
@@ -87,8 +96,8 @@ void parse_inotify_event( struct inotify_event * event )
 			}
 			log_notice( "%s %s to %s", config_record->name, old_name, new_name );
 
-			destroy_path( old_name );
-			destroy_path( new_name );
+			free( old_name );
+			free( new_name );
 		}
 	}
 }

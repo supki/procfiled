@@ -13,7 +13,7 @@ int main( int argc, char * argv[] )
 {
 	get_options( argc, argv );
 	daemonize( );
-	init_watches( get_config_name( ) );
+	init_watches( get_configfile_path( ) );
 
 	char events[ EVENT_BUF_LEN ];
 	while ( 1 )

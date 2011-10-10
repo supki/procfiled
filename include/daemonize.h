@@ -3,6 +3,6 @@
 
 void get_options( int argc, char * argv[] );
 void daemonize( void );
-char * get_config_name( void );
+char * get_configfile_path( void );
 
 #endif /* #define _MTD_DAEMONIZE_H_ */

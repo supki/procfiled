@@ -7,11 +7,9 @@ SRCDIR = src
 INCDIR = include
 
 OBJFILES = \
-$(OBJDIR)/path.o \
 $(OBJDIR)/logger.o \
 $(OBJDIR)/daemonize.o \
 $(OBJDIR)/attribute.o \
-$(OBJDIR)/command.o \
 $(OBJDIR)/config.o \
 $(OBJDIR)/watches.o \
 $(OBJDIR)/main.o \

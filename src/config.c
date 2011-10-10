@@ -1,24 +1,54 @@
+#include <fcntl.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "config.h"
-#include "command.h"
 #include "attribute.h"
-#include "path.h"
 
 #define for_each(type, head, item) \
-    for(type * item = head; item != NULL; item = item->next)
+	for(type * item = head; item != NULL; item = item->next)
 
-config_t * open_config( const char * path )
+static int copy( const char * old_name, const char * new_name )
 {
-	return fopen( path, "r" );
+	struct stat stat_buf;
+	if ( stat( old_name, &stat_buf ) == -1 )
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	int source = open( old_name, O_RDONLY );
+	int target = open( new_name, O_WRONLY | O_CREAT | O_TRUNC, stat_buf.st_mode );
+	if ( source == -1 )
+	{
+		errno = EBADF;
+		return -1;
+	}
+	if ( target == -1 )
+	{
+		close( source );
+		errno = EBADF;
+		return -1;
+	}
+
+	if ( sendfile( target, source, NULL, stat_buf.st_size ) == -1 )
+	{
+		close( source );
+		close( target );
+		errno = EACCES;
+		return -1;
+	}
+
+	close( source );
+	close( target );
+
+	return 0;
 }
 
-void close_config( config_t * config )
-{
-	fclose( config );
-}
 
 static int (*set_function_by_name( const char * name ))( const char *, const char * )
 {
