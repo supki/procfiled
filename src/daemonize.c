@@ -78,7 +78,7 @@ void get_options( int argc, char * argv[] )
 			break;
 
 		case 3:
-			config_file = expand_path( optarg );
+			config_file = optarg;
 			default_config = 0;
 			break;
 
@@ -157,7 +157,9 @@ char * get_config_name( void )
 {
 	if ( default_config )
 	{
-		config_file = construct_path( expand_path( "~" ), ".mtdconf" );
+		config_file = ( getuid( ) == 0 ) ?
+			construct_path( "/etc" , "mtd.conf" ):
+			construct_path( expand_path( "~" ), ".mtdconf" );
 	}
 
 	return config_file;

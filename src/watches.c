@@ -23,6 +23,10 @@ static void add_watches( void )
 {
 	sleep( 1 ); /* avoid too smart editor problem */
 	config_t * config = open_config( config_name );
+	if ( config == NULL )
+	{
+		log_error_and_exit( "Cannot open config file %s", config_name );
+	}
 	config_head = read_config( config );
 	close_config( config );
 	config_watch_instance = inotify_add_watch( inotify_instance, config_name, IN_MODIFY );
