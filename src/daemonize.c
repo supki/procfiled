@@ -18,6 +18,32 @@
 static int daemon_mode = 1;
 static int default_config = 1;
 static char * config_file = NULL;
+static int default_pidfile = 1;
+static char * pid_file = NULL;
+
+static char * get_pidfile_name( void )
+{
+	if ( default_pidfile )
+	{
+		pid_file = ( getuid( ) == 0 ) ?
+			construct_path( "/var/run" , "mtd.pid" ):
+			construct_path( expand_path( "~" ), ".mtdpid" );
+	}
+
+	return pid_file;
+}
+
+char * get_config_name( void )
+{
+	if ( default_config )
+	{
+		config_file = ( getuid( ) == 0 ) ?
+			construct_path( "/etc" , "mtd.conf" ):
+			construct_path( expand_path( "~" ), ".mtdconf" );
+	}
+
+	return config_file;
+}
 
 static void print_version( void )
 {
@@ -27,7 +53,7 @@ static void print_version( void )
 
 static void kill_daemon( void )
 {
-	char * pid_file = construct_path( expand_path( "~" ), ".mtdpid" );
+	char * pid_file = get_pidfile_name( );
 	int fd = open( pid_file, O_RDONLY );
 	if ( fd < 0 )
 	{
@@ -56,6 +82,7 @@ void get_options( int argc, char * argv[] )
 	{"version",    no_argument,       0,  1 },
 	{"kill",       no_argument,       0,  2 },
 	{"conf",       required_argument, 0,  3 },
+	{"pidfile",    required_argument, 0,  4 },
 	{"foreground", no_argument,       0, 'f'},
 	{0,            0,                 0,  0 }
 	};
@@ -80,6 +107,11 @@ void get_options( int argc, char * argv[] )
 		case 3:
 			config_file = optarg;
 			default_config = 0;
+			break;
+
+		case 4:
+			pid_file = optarg;
+			default_pidfile = 0;
 			break;
 
 		case 'f':
@@ -109,13 +141,13 @@ static void save_pid( void )
 	int length = snprintf( pid, sizeof( pid ), "%d", getpid( ) );
 	pid[length] = '\n';
 
-	char * pid_file = construct_path( expand_path( "~" ), ".mtdpid" );
+	char * pid_file = get_pidfile_name( );
+	log_info( "pidfile %s", pid_file );
 	int fd = open( pid_file, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR );
 	if ( fd < 0 )
 	{
 		log_error_and_exit( "Cannot open PID file" );
 	}
-	destroy_path( pid_file );
 	if ( flock( fd, LOCK_EX | LOCK_NB ) )
 	{
 		log_error_and_exit( "PID file locking is failed (another mtd instance is running?)." );
@@ -151,16 +183,4 @@ void daemonize( void )
 	atexit( log_end );
 
 	save_pid( );
-}
-
-char * get_config_name( void )
-{
-	if ( default_config )
-	{
-		config_file = ( getuid( ) == 0 ) ?
-			construct_path( "/etc" , "mtd.conf" ):
-			construct_path( expand_path( "~" ), ".mtdconf" );
-	}
-
-	return config_file;
 }
