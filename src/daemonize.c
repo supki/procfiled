@@ -135,35 +135,20 @@ void daemonize( void )
 		return;
 	}
 
-	signal(SIGHUP, signal_ignore_handler);
 	signal(SIGTERM, signal_term_handler);
+	signal(SIGHUP, signal_ignore_handler);
 	signal(SIGINT, signal_ignore_handler);
 	signal(SIGQUIT, signal_ignore_handler);
 
-	pid_t pid = fork( );
-	if ( pid < 0 )
+	if ( daemon( 0, 0 ) < 0 )
 	{
 		log_error_and_exit( "Cannot daemonize" );
 	}
-	if ( pid > 0 ) exit( EXIT_SUCCESS );
 
 	umask( 0 );
 
 	log_syslog_start( );
 	atexit( log_end );
-
-	if ( setsid( ) < 0 )
-	{
-		log_error_and_exit( "Cannot set daemon session leader!" );
-	}
-	if ( ( chdir( "/" ) ) < 0 )
-	{
-		log_error_and_exit( "Cannot change working directory to /" );
-	}
-
-	close( STDIN_FILENO );
-	close( STDOUT_FILENO );
-	close( STDERR_FILENO );
 
 	save_pid( );
 }
