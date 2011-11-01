@@ -1,6 +1,6 @@
 SOFTWARE = mtd
 
-CCFLAGS = -std=gnu99 -Wall -Werror -Wextra -O99 -Os
+CCFLAGS = -std=gnu99 -Wall -pedantic -Werror -Wextra -O99 -Os
 
 OBJDIR = obj
 SRCDIR = src

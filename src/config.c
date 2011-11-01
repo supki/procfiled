@@ -61,8 +61,9 @@ static int (*set_function_by_name( const char * name ))( const char *, const cha
 
 static config_record_t * read_next_record( config_t * config )
 {
-	char line[BUFSIZ];
-	if ( line != fgets( line, BUFSIZ, config ) ) return NULL;
+	char * line = NULL;
+	size_t size;
+	if ( getline( &line, &size, config ) == -1 ) return NULL;
 	line[ strlen( line ) - 1 ] = '\0';
 	init_attributes_line( line );
 
@@ -72,6 +73,8 @@ static config_record_t * read_next_record( config_t * config )
 	record->pattern = construct_next_attribute( mode_attribute );
 	record->source_path = construct_next_attribute( path_attribute );
 	record->destination_path = construct_next_attribute( path_attribute );
+
+	free( line );
 
 	return record;
 }
