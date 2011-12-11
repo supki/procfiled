@@ -31,8 +31,8 @@ static void add_watches( void )
 	config_watch_instance = inotify_add_watch( inotify_instance, config_name, IN_MODIFY );
 	for_each( config_record_t, config_head, config_record )
 	{
-		config_record->watch_instance = inotify_add_watch( inotify_instance, config_record->source_path, IN_CREATE | IN_MODIFY | IN_MOVED_TO );
-		log_info( "+ %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
+		config_record->watch_instance = inotify_add_watch( inotify_instance, config_record->src, IN_CREATE | IN_MODIFY | IN_MOVED_TO );
+		log_info( "+ %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->src, config_record->dst );
 	}
 }
 
@@ -41,7 +41,7 @@ static void remove_watches( void )
 	for_each( config_record_t, config_head, config_record )
 	{
 		inotify_rm_watch( inotify_instance, config_record->watch_instance );
-		log_info( "- %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->source_path, config_record->destination_path );
+		log_info( "- %d: %s %s from %s to %s", config_record->watch_instance, config_record->name, config_record->pattern, config_record->src, config_record->dst );
 	}
 	destroy_config( config_head );
 	inotify_rm_watch( inotify_instance, config_watch_instance );
@@ -87,8 +87,8 @@ void parse_inotify_event( struct inotify_event * event )
 
 		if ( !fnmatch( config_record->pattern, event->name, 0 ) )
 		{
-			char * old_name = construct_path( config_record->source_path, event->name );
-			char * new_name = construct_path( config_record->destination_path, event->name );
+			char * old_name = construct_path( config_record->src, event->name );
+			char * new_name = construct_path( config_record->dst, event->name );
 
 			if ( config_record->function( old_name, new_name ) == -1 )
 			{

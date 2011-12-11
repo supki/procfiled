@@ -9,8 +9,8 @@ typedef struct config_record_s
 	const char * name;
 	int (*function)( const char * old_name, const char * new_name );
 	const char * pattern;
-	const char * source_path;
-	const char * destination_path;
+	const char * src;
+	const char * dst;
 	struct config_record_s * next;
 } config_record_t;
 

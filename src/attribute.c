@@ -51,7 +51,11 @@ char * path_attribute( char * line, unsigned int length )
 	(void) length;
 	wordexp_t wordexp_buffer;
 	wordexp( line, &wordexp_buffer, 0 );
-	char * expanded = strdup( wordexp_buffer.we_wordv[0] );
+	char * expanded = NULL;
+	if ( strcmp( wordexp_buffer.we_wordv[0], "-" ) )
+	{
+		expanded = strdup( wordexp_buffer.we_wordv[0] );
+	}
 	wordfree( &wordexp_buffer );
 
 	return expanded;

@@ -6,8 +6,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "config.h"
 #include "attribute.h"
+#include "config.h"
+#include "logger.h"
 
 #define for_each(type, head, item) \
 	for(type * item = head; item != NULL; item = item->next)
@@ -71,8 +72,8 @@ static config_record_t * read_next_record( config_t * config )
 	record->name = construct_next_attribute( mode_attribute );
 	record->function = set_function_by_name( record->name );
 	record->pattern = construct_next_attribute( mode_attribute );
-	record->source_path = construct_next_attribute( path_attribute );
-	record->destination_path = construct_next_attribute( path_attribute );
+	record->src = construct_next_attribute( path_attribute );
+	record->dst = construct_next_attribute( path_attribute );
 
 	free( line );
 
@@ -81,19 +82,15 @@ static config_record_t * read_next_record( config_t * config )
 
 static int is_not_valid( config_record_t * record )
 {
-	return ( !record->name ||
-		!record->function ||
-		!record->pattern ||
-		!record->source_path ||
-		!record->destination_path );
+	return !( record->name && record->function && record->pattern && record->src && record->dst );
 }
 
 static void destroy_record( config_record_t * config_record )
 {
 	if ( config_record->name ) free( (void *)config_record->name );
 	if ( config_record->pattern ) free( (void *)config_record->pattern );
-	if ( config_record->source_path ) free( (void *)config_record->source_path );
-	if ( config_record->destination_path ) free( (void *)config_record->destination_path );
+	if ( config_record->src ) free( (void *)config_record->src );
+	if ( config_record->dst ) free( (void *)config_record->dst );
 	free( config_record );
 	config_record = NULL;
 }
@@ -101,7 +98,7 @@ static void destroy_record( config_record_t * config_record )
 void destroy_config( config_record_t * config_head )
 {
 	config_record_t * config_record = config_head;
-	while( config_record != NULL )
+	while ( config_record != NULL )
 	{
 		config_record_t * next = config_record->next;
 		destroy_record( config_record );
@@ -114,17 +111,21 @@ config_record_t * read_config( config_t * config )
 	if ( !config ) return NULL;
 	rewind( config );
 
-	config_record_t * prev_record = NULL, * record;
-	while ( ( record = read_next_record( config ) ) != NULL )
+	config_record_t * last = NULL, * curr;
+	while ( ( curr = read_next_record( config ) ) != NULL )
 	{
-		if ( is_not_valid( record ) )
+		if ( !last && ( !curr->src || !curr->dst ) ) log_error_and_exit( "Bad config" );
+		if ( !curr->src ) curr->src = last->src;
+		if ( !curr->dst ) curr->dst = last->dst;
+
+		if ( is_not_valid( curr ) )
 		{
-			destroy_record( record );
+			destroy_record( curr );
 			continue;
 		}
-		record->next = prev_record;
-		prev_record = record;
+		curr->next = last;
+		last = curr;
 	}
 
-	return prev_record;
+	return last;
 }
