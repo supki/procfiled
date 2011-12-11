@@ -3,19 +3,21 @@ MTD - Move Torrent Daemon
 
 What is MTD?
 ------------
-Move Torrent Daemon is a daemon, that automatically works with files. It could manage your ~/Downloads directory, for example. Consider:
+Move Torrent Daemon is a daemon automatically working with files. It could manage your ~/Downloads directory:
 ###config example###
 	$ cat ~/.mtdconf
-	move	*.torrent	~/Downloads	~/.torrents
-	move	*.png		~/Downloads	~/Pictures
-	move	*.jpg		~/Downloads	~/Pictures
-	move	*.gif		~/Downloads	~/Pictures
-	move	*.avi		~/Downloads	~/Videos
-	move	*.mp4		~/Downloads	~/Videos
-	copy	*.chm		~/Downloads	~/Dropbox/Books
-	copy	*.pdf		~/Downloads	~/Dropbox/Books
+	move	*.torrent	~/Downloads	~/Downloads/.torrents
+	move	*.png		-	~/Pictures
+	move	*.jpg		-	-
+	move	*.gif		-	-
+	move	*.avi		-	~/Videos
+	move	*.mp4		-	-
+	copy	*.pdf		-	~/Dropbox/Books
+	copy	*.chm		-	-
 
 	link	*HD*		~/Videos	~/Videos/HD
+
+With this config MTD will move \*.torrent from ~/Downloads to ~/Downloads/.torrents, \*.png, \*.jpg and \*.gif to ~/Pictures, \*.avi and \*.mp4 to ~/Videos; copies \*.pdf and \*.chm to ~/Dropbox/Books and links \*HD\* from ~/Videos to ~/Videos/HD.
 
 MTD is based on Inotify subsystem, so you need Linux Kernal >= 2.6.13 and glibc >= 2.4
 
