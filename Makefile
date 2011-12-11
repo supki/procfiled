@@ -1,4 +1,4 @@
-SOFTWARE = mtd
+SOFTWARE = procfiled
 
 CCFLAGS = -std=gnu99 -Wall -pedantic -Werror -Wextra -O99 -Os
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-software="mtd"
+software="procfiled"
 
 while [ $# -ge 1 ]; do
 	case $1 in

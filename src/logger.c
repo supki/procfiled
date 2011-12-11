@@ -6,7 +6,7 @@
 
 #include "logger.h"
 
-#define DAEMON_NAME   "mtd"
+#define DAEMON_NAME   "Procfiled"
 
 static int syslog_enabled = 0;
 

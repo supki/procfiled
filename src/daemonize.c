@@ -36,8 +36,8 @@ static char * get_pidfile_path( void )
 	if ( default_pidfile )
 	{
 		pid_file = ( getuid( ) == 0 ) ?
-			strdup( "/var/run/mtd.pid" ):
-			expand_path( "~/.mtdpid" );
+			strdup( "/var/run/procfiled.pid" ):
+			expand_path( "~/.procfiledpid" );
 	}
 
 	return pid_file;
@@ -45,7 +45,7 @@ static char * get_pidfile_path( void )
 
 static void print_version( void )
 {
-	printf( "mtd (MTD: Move Torrents Daemon) 0.2.0\n\nCopyright (C) 2011 Matvey Aksenov <matvey.aksenov@gmail.com>\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
+	printf( "Procfiled 0.2.0\n\nCopyright (C) 2011 Matvey Aksenov <matvey.aksenov@gmail.com>\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 	exit( EXIT_SUCCESS );
 }
 
@@ -149,7 +149,7 @@ static void save_pid( void )
 	free( pid_file );
 	if ( flock( fd, LOCK_EX | LOCK_NB ) )
 	{
-		log_error_and_exit( "PID file locking is failed (another mtd instance is running?)." );
+		log_error_and_exit( "PID file locking is failed (another Procfiled instance is running?)." );
 	}
 	if ( write( fd, &pid, length + 1 ) == -1 )
 	{
@@ -189,8 +189,8 @@ char * get_configfile_path( void )
 	if ( default_config )
 	{
 		config_file = ( getuid( ) == 0 ) ?
-			strdup( "/etc/mtd.conf" ):
-			expand_path( "~/.mtdconf" );
+			strdup( "/etc/procfiled.conf" ):
+			expand_path( "~/.procfiledconf" );
 	}
 
 	return config_file;
