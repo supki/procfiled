@@ -63,8 +63,4 @@ What is implemented?
 
 What will be implemented?
 -------------------------
-
-Who did this?
--------------
-Matvey Aksenov
-matvey.aksenov@gmail.com
+*
