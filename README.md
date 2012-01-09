@@ -19,7 +19,7 @@ Procfiled is a daemon automatically working with files. It could manage your ~/D
 
 With this config Procfiled will move \*.torrent from ~/Downloads to ~/Downloads/.torrents, \*.png, \*.jpg and \*.gif to ~/Pictures, \*.avi and \*.mp4 to ~/Videos; copies \*.pdf and \*.chm to ~/Dropbox/Books and links \*HD\* from ~/Videos to ~/Videos/HD.
 
-Procfiled is based on Inotify subsystem, so you need Linux Kernal >= 2.6.13 and glibc >= 2.4
+Procfiled is based on Inotify subsystem, so you need Linux Kernel >= 2.6.13 and glibc >= 2.4
 
 What about licensing?
 ---------------------
