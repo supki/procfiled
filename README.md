@@ -63,4 +63,4 @@ What is implemented?
 
 What will be implemented?
 -------------------------
-*  
+* some notification system (possibly libnotify)
