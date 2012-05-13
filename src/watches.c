@@ -1,13 +1,14 @@
 #include <err.h>
 #include <fnmatch.h>
 #include <errno.h>
+#include <libnotify/notify.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "logger.h"
 #include "config.h"
+#include "logger.h"
 #include "watches.h"
 
 #define for_each(type, head, item) \
@@ -49,6 +50,7 @@ static void remove_watches( void )
 
 void init_watches( char * config_file )
 {
+	notify_init( "procfiled" );
 	inotify_instance = inotify_init( );
 	config_name = config_file;
 	add_watches( );
@@ -67,6 +69,21 @@ static char * construct_path( const char * dir_name, const char * file_name )
 	strcat( path, file_name );
 
 	return path;
+}
+
+#define MAX_NOTIFICATION_BODY_LENGTH 80
+static void notify_send ( NotifyUrgency urgency, const char * title, const char * fmt, ... )
+{
+	va_list args;
+	va_start( args, fmt );
+
+	char body[MAX_NOTIFICATION_BODY_LENGTH];
+	vsnprintf( body, MAX_NOTIFICATION_BODY_LENGTH-1, fmt, args );
+
+	NotifyNotification *example;
+	example = notify_notification_new( title, body, NULL );
+	notify_notification_set_urgency( example, urgency );
+	notify_notification_show( example, NULL );
 }
 
 void parse_inotify_event( struct inotify_event * event )
@@ -93,8 +110,10 @@ void parse_inotify_event( struct inotify_event * event )
 			if ( config_record->function( old_name, new_name ) == -1 )
 			{
 				log_warning( "daemon failed to %s: %s", config_record->name, strerror( errno ) );
+				notify_send( NOTIFY_URGENCY_CRITICAL, "daemon failed to %s: %s", config_record->name, strerror( errno ) );
 			}
 			log_notice( "%s %s to %s", config_record->name, old_name, new_name );
+			notify_send( NOTIFY_URGENCY_NORMAL, config_record->name, "%s\n→\n%s", old_name, new_name );
 
 			free( old_name );
 			free( new_name );

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/inotify.h>
 
-#include "daemonize.h" 
+#include "daemonize.h"
 #include "logger.h"
 #include "watches.h"
 
