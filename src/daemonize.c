@@ -162,7 +162,7 @@ void daemonize( void )
 {
 	if ( !daemon_mode )
 	{
-		log_warning( "foreground mode is enabled" );
+		log_notice( "foreground mode is enabled" );
 		return;
 	}
 
